@@ -15,7 +15,7 @@ if (!databaseUrl) {
 
 export const pool = new Pool({
   connectionString: databaseUrl,
-  max: 10, // increased from 3 — T18
+  max: 3, // T18 reverted — Supabase Session mode pool_size exhaustion on Render deploy
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
 });

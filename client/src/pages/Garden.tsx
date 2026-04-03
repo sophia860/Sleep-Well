@@ -99,7 +99,7 @@ function ZoneNav({ active, onChange }: { active: Zone; onChange: (z: Zone) => vo
 }
 
 function RoomsStrip({ activeRoom, onSelectRoom }: { activeRoom: ActiveRoom; onSelectRoom: (room: ActiveRoom) => void }) {
-  const [showRooms, setShowRooms] = useState(false);
+  
   const activeRoomData = rooms.find(r => r.id === activeRoom);
 
   return (
@@ -117,41 +117,41 @@ function RoomsStrip({ activeRoom, onSelectRoom }: { activeRoom: ActiveRoom; onSe
           </button>
         )}
         <button
-          onClick={() => setShowRooms(!showRooms)}
+          onClick={() => void 0}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border font-mono text-[9px] uppercase tracking-widest whitespace-nowrap transition-all ${
-            showRooms
+            true
               ? "border-white/20 bg-white/[0.06] text-white/90"
               : "border-emerald-800/12 text-white/90 hover:text-white/90 hover:border-emerald-700/20"
           }`}
-          data-testid="button-discover-rooms"
+          data-testid="button-discover-rooms" hidden
         >
           <Compass size={12} />
           Discover
-          <ChevronDown size={10} className={`transition-transform ${showRooms ? "rotate-180" : ""}`} />
+          <ChevronDown size={10} className={`transition-transform ${true ? "rotate-180" : ""}`} />
         </button>
       </div>
 
       <AnimatePresence>
-        {showRooms && (
+        {true && (
           <motion.div
-            initial={{ opacity: 0, y: -4, height: 0 }}
+            initial={{ opacity: 1, y: 0, height: "auto" }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -4, height: 0 }}
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-2">
+            <div className="flex flex-wrap gap-2 pt-2">
               {rooms.map((room) => {
                 const isActive = activeRoom === room.id;
                 return (
                   <button
                     key={room.id}
-                    onClick={() => { onSelectRoom(isActive ? null : room.id as ActiveRoom); setShowRooms(false); }}
+                    onClick={() => { onSelectRoom(isActive ? null : room.id as ActiveRoom); ; }}
                     title={room.desc}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border font-mono text-[9px] uppercase tracking-widest whitespace-nowrap transition-all ${
                       isActive
                         ? "border-emerald-600/25 bg-emerald-900/20 text-emerald-200/80"
-                        : "border-white/[0.06] text-white/90 hover:text-white/90 hover:border-white/15 hover:bg-white/[0.03]"
+                        : "border-emerald-800/20 text-white/70 hover:text-white/90 hover:border-emerald-600/40 hover:bg-emerald-900/20"
                     }`}
                     data-testid={`room-${room.id}`}
                   >
@@ -3834,7 +3834,7 @@ export default function Garden() {
   );
 }
 
-function CollectionsRedirect() {   useEffect(() => { window.location.href = "/garden/collections"; }, []);   return <div className="flex items-center justify-center py-20"><p className="font-mono text-[10px] uppercase tracking-widest text-white/40">Opening your beds...</p></div>; } function GardenGateZone() {
+function CollectionsRedirect() {   const [, navigate] = useLocation(); useEffect(() => { navigate("/collections"); }, []);   return <div className="flex items-center justify-center py-20"><p className="font-mono text-[10px] uppercase tracking-widest text-white/40">Opening your beds...</p></div>; } function GardenGateZone() {
   const { user } = useAuth();
   const { data: writings = [] } = useQuery({
     queryKey: ["/api/writings"],
