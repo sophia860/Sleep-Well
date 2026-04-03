@@ -13,7 +13,6 @@ import LoadingScreen from "@/components/garden/LoadingScreen";
 import { useAuth } from "@/hooks/use-auth";
 import StarBackground from "@/components/StarBackground";
 import IllustrationLayer from "@/components/IllustrationLayer";
-
 const Home = lazy(() => import("@/pages/Home"));
 const Garden = lazy(() => import("@/pages/Garden"));
 const Collections = lazy(() => import("@/pages/Collections"));
@@ -47,7 +46,6 @@ const Opportunities = lazy(() => import("@/pages/Opportunities"));
 const Submissions = lazy(() => import("@/pages/Submissions"));
 const ForJournals = lazy(() => import("@/pages/ForJournals"));
 const Saved = lazy(() => import("@/pages/Saved"));
-
 // V2 Redesign pages
 const V2Dashboard = lazy(() => import("@/pages/V2Dashboard"));
 const V2ReadingRoom = lazy(() => import("@/pages/V2ReadingRoom"));
@@ -56,7 +54,9 @@ const EditorialDashboard = lazy(() => import("@/pages/EditorialDashboard"));
 const EditorialPayment = lazy(() => import("@/pages/EditorialPayment"));
 const EditorialRoom = lazy(() => import("@/pages/EditorialRoom"));
 const Marketplace = lazy(() => import("@/pages/Marketplace"));
-
+// April features
+const April = lazy(() => import("@/pages/April"));
+const AprilPocket = lazy(() => import("@/pages/AprilPocket"));
 function ProtectedRoute({ component: Component, path }: { component: React.ComponentType; path: string }) {
   const { user, isLoading } = useAuth();
   if (isLoading) {
@@ -67,7 +67,6 @@ function ProtectedRoute({ component: Component, path }: { component: React.Compo
   }
   return <Component />;
 }
-
 // T-audit: Editor-only route — requires editor or editor_in_chief role
 function EditorProtectedRoute({ component: Component, path }: { component: React.ComponentType; path: string }) {
   const { user, isLoading } = useAuth();
@@ -82,7 +81,6 @@ function EditorProtectedRoute({ component: Component, path }: { component: React
   }
   return <Component />;
 }
-
 const PAGE_TITLES: Record<string, string> = {
   "/": "The Page Gallery Journal — A Literary Journal & Writing Garden",
   "/in-bloom": "The Journal — The Page Gallery",
@@ -100,8 +98,8 @@ const PAGE_TITLES: Record<string, string> = {
   "/sign-in": "Sign In — The Page Gallery",
   "/for-journals": "For Journals — The Page Gallery",
   "/saved": "Saved Pieces — The Page Gallery",
+  "/april": "April Prompts — The Page Gallery",
 };
-
 function PageTitle() {
   const [location] = useLocation();
   useEffect(() => {
@@ -113,7 +111,6 @@ function PageTitle() {
   }, [location]);
   return null;
 }
-
 function Router() {
   return (
     <Suspense fallback={<LoadingScreen />}>
@@ -162,19 +159,19 @@ function Router() {
         <Route path="/editorial-payment">{() => <ProtectedRoute component={EditorialPayment} path="/editorial-payment" />}</Route>
         <Route path="/editorial-room">{() => <ProtectedRoute component={EditorialRoom} path="/editorial-room" />}</Route>
         <Route path="/marketplace" component={Marketplace} />
-                  <Route path="/atelier" component={Atelier} />
+        <Route path="/atelier" component={Atelier} />
+        <Route path="/april" component={April} />
+        <Route path="/april/pocket/:username" component={AprilPocket} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
   );
 }
-
 function App() {
   const shouldReduceMotion = useReducedMotion();
   if (shouldReduceMotion) {
     // Ensure reduced motion preference is observed; MotionConfig user setting handles it.
   }
-
   return (
     <MotionConfig reducedMotion="user">
       <QueryClientProvider client={queryClient}>
@@ -194,5 +191,4 @@ function App() {
     </MotionConfig>
   );
 }
-
 export default App;

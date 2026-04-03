@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { User } from "@shared/models/auth";
-
 async function fetchUser(): Promise<User | null> {
   const response = await fetch("/api/auth/user", {
     credentials: "include",
@@ -13,7 +12,6 @@ async function fetchUser(): Promise<User | null> {
   }
   return response.json();
 }
-
 async function loginWithEmail(data: { email: string; password: string }): Promise<any> {
   const response = await fetch("/api/login", {
     method: "POST",
@@ -27,7 +25,6 @@ async function loginWithEmail(data: { email: string; password: string }): Promis
   }
   return response.json();
 }
-
 async function registerWithEmail(data: { email: string; password: string; firstName: string; lastName: string }): Promise<any> {
   const response = await fetch("/api/register", {
     method: "POST",
@@ -41,10 +38,8 @@ async function registerWithEmail(data: { email: string; password: string; firstN
   }
   return response.json();
 }
-
 export function useAuth() {
   const queryClient = useQueryClient();
-
   const { data: user, isPending: isLoading } = useQuery<User | null>({
     queryKey: ["/api/auth/user"],
     queryFn: fetchUser,
@@ -53,7 +48,6 @@ export function useAuth() {
     refetchOnWindowFocus: true,
     gcTime: 30000,
   });
-
   const logoutMutation = useMutation({
     mutationFn: async () => {
       await fetch("/api/logout", { method: "GET", credentials: "include" });
@@ -64,7 +58,6 @@ export function useAuth() {
       window.location.href = "/";
     },
   });
-
   const loginMutation = useMutation({
     mutationFn: loginWithEmail,
     onSuccess: async () => {
@@ -73,14 +66,12 @@ export function useAuth() {
       await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
     },
   });
-
   const registerMutation = useMutation({
     mutationFn: registerWithEmail,
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
     },
   });
-
   return {
     user,
     isLoading,
