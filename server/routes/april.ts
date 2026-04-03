@@ -64,9 +64,9 @@ export function registerAprilRoutes(app: Express) {
       const { username } = req.params;
 
       const [user] = await db
-        .select({ id: users.id, displayName: users.displayName, username: users.username })
+        .select({ id: users.id, displayName: users.displayName })
         .from(users)
-        .where(eq(users.username, username))
+        .where(eq(users.id, username))
         .limit(1);
 
       if (!user) {
@@ -103,7 +103,7 @@ export function registerAprilRoutes(app: Express) {
         user: {
           id: user.id,
           displayName: user.displayName,
-          username: user.username,
+          username: user.id,
         },
         pieces,
         year,
