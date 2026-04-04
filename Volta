@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volta — Poetry Collection Architect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..500&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{--text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);--text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);--text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);--text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);--text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);--text-2xl:clamp(2rem,1.2rem + 2.5vw,3.5rem);--sp1:.25rem;--sp2:.5rem;--sp3:.75rem;--sp4:1rem;--sp5:1.25rem;--sp6:1.5rem;--sp8:2rem;--sp10:2.5rem;--sp12:3rem;--sp16:4rem;--sp20:5rem;--bg:#f5f4f0;--surface:#faf9f7;--surface2:#ffffff;--soff:#eeece7;--sdyn:#e5e2db;--div:#dbd8d2;--brd:#d0cdc6;--tx:#1e1c17;--txm:#6b6960;--txf:#b0aea8;--txi:#f9f8f4;--pri:#3d2e6e;--prih:#2d2156;--pria:#1f163d;--prhl:#e1ddf0;--prsub:#f0eef8;--amber:#c47a1a;--amber-l:#fdf0d8;--rose:#b0394a;--rose-l:#fde8eb;--sage:#3a6b4a;--sage-l:#dff0e7;--slate:#3a5a7a;--slate-l:#ddeaf5;--dusk:#6b4a7a;--dusk-l:#ecdff5;--stone:#7a6a58;--stone-l:#f0ece6;--r-sm:.375rem;--r-md:.5rem;--r-lg:.75rem;--r-xl:1rem;--r-2xl:1.5rem;--r-full:9999px;--tr:180ms cubic-bezier(0.16,1,0.3,1);--tr-fast:120ms cubic-bezier(0.16,1,0.3,1);--tr-slow:300ms cubic-bezier(0.16,1,0.3,1);--sh-sm:0 1px 2px oklch(0.18 0.02 60/0.06);--sh-md:0 4px 12px oklch(0.18 0.02 60/0.09);--sh-lg:0 12px 32px oklch(0.18 0.02 60/0.13);--sh-xl:0 24px 48px oklch(0.18 0.02 60/0.16);--fd:'Instrument Serif',Georgia,serif;--fb:'DM Sans','Helvetica Neue',sans-serif;--sw:260px;--th:56px;}
+[data-theme="dark"]{--bg:#111010;--surface:#171614;--surface2:#1d1c1a;--soff:#1a1918;--sdyn:#252320;--div:#201f1d;--brd:#2f2e2b;--tx:#cbc9c3;--txm:#777570;--txf:#4a4845;--txi:#1a1916;--pri:#8f7dcc;--prih:#7a67bd;--pria:#6552ad;--prhl:#2a2540;--prsub:#211d35;--amber:#e09b40;--amber-l:#2a2215;--rose:#d96070;--rose-l:#2a1a1d;--sage:#5a9b6a;--sage-l:#152019;--slate:#5a8aaa;--slate-l:#151e26;--dusk:#9a7aaa;--dusk-l:#201828;--stone:#9a8a78;--stone-l:#201d18;--sh-sm:0 1px 2px oklch(0 0 0/0.2);--sh-md:0 4px 12px oklch(0 0 0/0.3);--sh-lg:0 12px 32px oklch(0 0 0/0.4);--sh-xl:0 24px 48px oklch(0 0 0/0.5);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{font-family:var(--fb);font-size:var(--text-sm);color:var(--tx);background:var(--bg);min-height:100dvh;overflow:hidden}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}input,textarea,select{font:inherit;color:inherit;background:none;border:none;outline:none}ul,ol{list-style:none}
+::selection{background:color-mix(in oklch,var(--pri) 20%,transparent)}:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:var(--r-sm)}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--brd);border-radius:var(--r-full)}
+#app{display:grid;grid-template-columns:var(--sw) 1fr;grid-template-rows:var(--th) 1fr;height:100dvh;width:100vw}
+#topbar{grid-column:1/-1;display:flex;align-items:center;gap:var(--sp4);padding:0 var(--sp6);background:var(--surface);border-bottom:1px solid var(--div);position:relative;z-index:20}
+.logo{display:flex;align-items:center;gap:var(--sp2);text-decoration:none;color:var(--tx);flex-shrink:0}
+.logo-mark{width:26px;height:26px;color:var(--pri)}.logo-name{font-family:var(--fd);font-style:italic;font-size:clamp(1.05rem,1.4vw,1.3rem);letter-spacing:-0.01em}
+.coll-badge{font-size:var(--text-xs);color:var(--txm);margin-left:var(--sp4);padding-left:var(--sp4);border-left:1px solid var(--div);display:flex;align-items:center;gap:var(--sp2)}
+.coll-badge span{color:var(--tx);font-weight:500}
+.topbar-tabs{display:flex;gap:var(--sp1);margin-left:var(--sp4)}
+.tab-btn{display:flex;align-items:center;gap:var(--sp2);padding:var(--sp2) var(--sp3);border-radius:var(--r-md);font-size:var(--text-xs);font-weight:500;color:var(--txm);transition:background var(--tr),color var(--tr)}
+.tab-btn:hover{background:var(--soff);color:var(--tx)}.tab-btn.active{background:var(--prsub);color:var(--pri)}.tab-btn svg{width:13px;height:13px;flex-shrink:0}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:var(--sp2)}
+.btn{display:inline-flex;align-items:center;gap:var(--sp2);padding:var(--sp2) var(--sp4);border-radius:var(--r-md);font-size:var(--text-xs);font-weight:500;transition:background var(--tr),color var(--tr),box-shadow var(--tr),transform var(--tr);white-space:nowrap;cursor:pointer}.btn svg{width:13px;height:13px;flex-shrink:0}
+.btn-ghost{color:var(--txm)}.btn-ghost:hover{background:var(--soff);color:var(--tx)}
+.btn-primary{background:var(--pri);color:var(--txi)}.btn-primary:hover{background:var(--prih);transform:translateY(-1px);box-shadow:var(--sh-md)}.btn-primary:active{transform:translateY(0);box-shadow:var(--sh-sm)}
+.btn-outline{background:var(--soff);color:var(--tx);border:1px solid var(--brd)}.btn-outline:hover{background:var(--sdyn)}
+.ib{width:30px;height:30px;display:grid;place-items:center;border-radius:var(--r-md);color:var(--txm);transition:background var(--tr),color var(--tr);cursor:pointer}.ib:hover{background:var(--soff);color:var(--tx)}.ib svg{width:15px;height:15px}
+#sidebar{background:var(--surface);border-right:1px solid var(--div);display:flex;flex-direction:column;overflow:hidden}
+.sb-label{font-size:var(--text-xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--txf);padding:var(--sp4) var(--sp4) var(--sp2)}
+.sb-scroll{flex:1;overflow-y:auto;padding-bottom:var(--sp4)}
+.sb-poem{display:flex;align-items:flex-start;gap:var(--sp2);padding:var(--sp3) var(--sp4);cursor:pointer;transition:background var(--tr-fast);border-left:2px solid transparent}
+.sb-poem:hover{background:var(--soff)}.sb-poem.sel{background:var(--prsub);border-left-color:var(--pri)}
+.reg-dot{width:7px;height:7px;border-radius:var(--r-full);flex-shrink:0;margin-top:5px}
+.sb-body{flex:1;min-width:0}.sb-title{font-family:var(--fd);font-style:italic;font-size:var(--text-sm);color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.sb-line{font-size:var(--text-xs);color:var(--txm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.sb-num{font-size:var(--text-xs);color:var(--txf);font-variant-numeric:tabular-nums;flex-shrink:0;line-height:1.8}
+.sb-add{display:flex;align-items:center;gap:var(--sp2);padding:var(--sp3) var(--sp4);font-size:var(--text-xs);color:var(--pri);transition:background var(--tr-fast);width:100%;text-align:left}
+.sb-add:hover{background:var(--prsub)}.sb-add svg{width:13px;height:13px}
+.sb-foot{border-top:1px solid var(--div);padding:var(--sp3) var(--sp4);display:flex;align-items:center;justify-content:space-between}
+.sb-ct{font-size:var(--text-xs);color:var(--txm)}.sb-ct strong{color:var(--tx);font-variant-numeric:tabular-nums}
+#main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.panel{display:none;flex:1;overflow:hidden}.panel.active{display:flex;flex-direction:column}
+#canvas-panel{flex:1;position:relative;overflow:hidden}
+.cvs{width:100%;height:100%;position:relative;overflow:auto;cursor:default}
+.cvs-grid{position:absolute;inset:0;background-image:radial-gradient(circle,var(--div) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.cvs-inner{position:absolute;top:0;left:0;width:2200px;height:1500px}
+.pnode{position:absolute;width:196px;background:var(--surface);border:1px solid var(--brd);border-radius:var(--r-xl);padding:var(--sp4);cursor:grab;transition:box-shadow var(--tr),border-color var(--tr);user-select:none;box-shadow:var(--sh-sm)}
+.pnode:hover{box-shadow:var(--sh-md);border-color:var(--pri);z-index:10}.pnode.dragging{cursor:grabbing;box-shadow:var(--sh-xl);z-index:100}
+.pnode.sel{border-color:var(--pri);box-shadow:0 0 0 3px var(--prhl),var(--sh-md)}
+.pnode-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp3)}
+.rbadge{font-size:.65rem;font-weight:500;padding:2px var(--sp2);border-radius:var(--r-full);line-height:1.6}
+.pnode-num{font-size:var(--text-xs);color:var(--txf);font-variant-numeric:tabular-nums}
+.pnode-title{font-family:var(--fd);font-style:italic;font-size:var(--text-base);line-height:1.3;color:var(--tx);margin-bottom:var(--sp2)}
+.pnode-line{font-size:var(--text-xs);color:var(--txm);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pnode-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:var(--sp3)}.pnode-tag{font-size:.62rem;padding:1px var(--sp2);background:var(--soff);border-radius:var(--r-full);color:var(--txm)}
+.cvs-bar{position:absolute;bottom:var(--sp6);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--brd);border-radius:var(--r-full);padding:var(--sp2) var(--sp3);display:flex;align-items:center;gap:var(--sp1);box-shadow:var(--sh-lg);z-index:30}
+.bsep{width:1px;height:18px;background:var(--div);margin:0 var(--sp1)}.bhint{font-size:var(--text-xs);color:var(--txm);padding:0 var(--sp2)}
+#arc-panel{padding:var(--sp6) var(--sp8);overflow-y:auto;gap:var(--sp6)}
+.arc-head{display:flex;align-items:center;justify-content:space-between}.arc-h{font-family:var(--fd);font-style:italic;font-size:var(--text-xl);color:var(--tx)}
+.arc-leg{display:flex;flex-wrap:wrap;gap:var(--sp3)}.leg-item{display:flex;align-items:center;gap:var(--sp2);font-size:var(--text-xs);color:var(--txm)}.leg-dot{width:9px;height:9px;border-radius:var(--r-full)}
+.arc-chart{background:var(--surface);border:1px solid var(--div);border-radius:var(--r-xl);padding:var(--sp6);margin-top:var(--sp4)}
+.arc-blocks{display:flex;gap:3px;height:52px}
+.arc-block{height:100%;flex:1;border-radius:var(--r-sm);cursor:pointer;transition:transform var(--tr-fast),box-shadow var(--tr-fast);position:relative}
+.arc-block:hover{transform:scaleY(1.1);box-shadow:var(--sh-md);z-index:5}
+.arc-tt{position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:var(--tx);color:var(--txi);font-size:.65rem;padding:3px var(--sp3);border-radius:var(--r-md);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--tr-fast);z-index:20;line-height:1.6}
+.arc-block:hover .arc-tt{opacity:1}
+.arc-flags{margin-top:var(--sp4);display:flex;flex-direction:column;gap:var(--sp2)}
+.arc-flag{display:flex;align-items:flex-start;gap:var(--sp3);padding:var(--sp3) var(--sp4);background:var(--soff);border-radius:var(--r-lg);border-left:3px solid transparent}
+.arc-flag.warn{border-left-color:var(--amber);background:var(--amber-l)}.arc-flag.info{border-left-color:var(--slate);background:var(--slate-l)}.arc-flag.ok{border-left-color:var(--sage);background:var(--sage-l)}
+.arc-flag svg{width:13px;height:13px;flex-shrink:0;margin-top:2px}.af-t{font-size:var(--text-xs);font-weight:600;color:var(--tx)}.af-d{font-size:var(--text-xs);color:var(--txm);margin-top:2px}
+#inspector-panel{padding:var(--sp6) var(--sp8);overflow-y:auto;gap:var(--sp5)}
+.ins-h{font-family:var(--fd);font-style:italic;font-size:var(--text-xl)}.ins-info{font-size:var(--text-xs);color:var(--txm)}
+.tr-pair{display:grid;grid-template-columns:1fr auto 1fr;gap:var(--sp4);align-items:start;margin-top:var(--sp4)}
+.tr-card{background:var(--surface);border:1px solid var(--brd);border-radius:var(--r-xl);padding:var(--sp5)}
+.tr-lbl{font-size:var(--text-xs);color:var(--txf);text-transform:uppercase;letter-spacing:.08em;margin-bottom:var(--sp3);font-weight:600}
+.tr-title{font-family:var(--fd);font-style:italic;font-size:var(--text-lg);color:var(--tx);margin-bottom:var(--sp4)}
+.tr-lines{display:flex;flex-direction:column;gap:3px}.tr-line{font-size:var(--text-sm);color:var(--txm);line-height:1.75;font-style:italic}
+.tr-line.hi{color:var(--tx);font-weight:500}.tr-line.fd{color:var(--txf)}
+.tr-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:var(--sp8);gap:var(--sp2)}.tr-arrow svg{width:22px;height:22px;color:var(--pri)}
+.tr-notes{margin-top:var(--sp4);background:var(--surface);border:1px solid var(--div);border-radius:var(--r-xl);padding:var(--sp5)}
+.tr-notes-t{font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txf);margin-bottom:var(--sp3)}
+.chips{display:flex;flex-wrap:wrap;gap:var(--sp2)}.chip{display:flex;align-items:center;gap:var(--sp2);padding:var(--sp2) var(--sp3);border-radius:var(--r-full);font-size:var(--text-xs);font-weight:500}.chip svg{width:11px;height:11px}
+.chip-echo{background:var(--sage-l);color:var(--sage)}.chip-img{background:var(--dusk-l);color:var(--dusk)}.chip-shift{background:var(--amber-l);color:var(--amber)}.chip-risk{background:var(--rose-l);color:var(--rose)}
+.tr-ann{margin-top:var(--sp4);width:100%;min-height:72px;background:var(--soff);border:1px solid var(--brd);border-radius:var(--r-lg);padding:var(--sp3) var(--sp4);font-size:var(--text-xs);color:var(--tx);resize:vertical;font-family:var(--fb);line-height:1.6;transition:border-color var(--tr)}
+.tr-ann:focus{border-color:var(--pri);outline:none}.tr-ann::placeholder{color:var(--txf)}
+#spine-panel{padding:var(--sp6) var(--sp8);overflow-y:auto;gap:var(--sp5)}
+.sdoc{max-width:680px;margin:var(--sp4) auto 0;background:var(--surface);border:1px solid var(--div);border-radius:var(--r-xl);padding:var(--sp10) var(--sp12)}
+.s-title{font-family:var(--fd);font-size:var(--text-2xl);font-style:italic;letter-spacing:-0.02em;line-height:1.15;margin-bottom:var(--sp2)}.s-sub{font-size:var(--text-xs);color:var(--txm);margin-bottom:var(--sp8)}
+.s-div{height:1px;background:var(--div);margin:var(--sp5) 0}.s-sec{font-size:var(--text-xs);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--txf);margin-bottom:var(--sp4)}
+.s-row{display:flex;align-items:flex-start;gap:var(--sp4);padding:var(--sp3) 0;border-bottom:1px solid var(--soff)}
+.s-n{font-size:var(--text-xs);color:var(--txf);font-variant-numeric:tabular-nums;width:22px;flex-shrink:0;padding-top:2px}
+.s-m{flex:1}.s-name{font-family:var(--fd);font-style:italic;font-size:var(--text-base);color:var(--tx)}.s-line{font-size:var(--text-xs);color:var(--txm);margin-top:2px}
+.s-r{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}.s-pill{font-size:var(--text-xs);padding:2px var(--sp2);border-radius:var(--r-full);font-weight:500}.s-nt{font-size:var(--text-xs);color:var(--txf);max-width:150px;text-align:right;font-style:italic}
+.moverlay{position:fixed;inset:0;background:oklch(0.1 0.01 60/0.5);z-index:200;display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity var(--tr-slow);backdrop-filter:blur(4px)}
+.moverlay.open{opacity:1;pointer-events:all}.modal{background:var(--surface);border:1px solid var(--brd);border-radius:var(--r-2xl);padding:var(--sp8);max-width:450px;width:90%;box-shadow:var(--sh-xl);transform:scale(0.95) translateY(8px);transition:transform var(--tr-slow)}
+.moverlay.open .modal{transform:scale(1) translateY(0)}.m-title{font-family:var(--fd);font-style:italic;font-size:var(--text-lg);color:var(--tx);margin-bottom:var(--sp6)}
+.mf{margin-bottom:var(--sp4)}.mlbl{display:block;font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txm);margin-bottom:var(--sp2)}
+.mi{width:100%;padding:var(--sp3) var(--sp4);background:var(--soff);border:1px solid var(--brd);border-radius:var(--r-lg);font-size:var(--text-sm);color:var(--tx);transition:border-color var(--tr);font-family:var(--fb)}
+.mi:focus{border-color:var(--pri);outline:none}.mi::placeholder{color:var(--txf)}.mfoot{display:flex;justify-content:flex-end;gap:var(--sp3);margin-top:var(--sp6)}
+.mreg{display:flex;gap:var(--sp2);flex-wrap:wrap}.mreg-b{display:flex;align-items:center;gap:var(--sp2);padding:var(--sp2) var(--sp3);border-radius:var(--r-full);font-size:var(--text-xs);font-weight:500;border:1.5px solid transparent;transition:all var(--tr);cursor:pointer}.mreg-b.sel{border-color:currentColor;font-weight:600}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:var(--sp20) var(--sp8);gap:var(--sp4);height:100%}
+.empty svg{width:44px;height:44px;color:var(--txf)}.empty h3{font-family:var(--fd);font-style:italic;font-size:var(--text-lg);color:var(--tx)}.empty p{font-size:var(--text-sm);color:var(--txm);max-width:36ch;line-height:1.6}
+@keyframes fU{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}.fu{animation:fU .28s cubic-bezier(0.16,1,0.3,1) forwards}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="app">
+<header id="topbar">
+  <a class="logo" href="#" onclick="return false" aria-label="Volta">
+    <svg class="logo-mark" viewBox="0 0 26 26" fill="none" aria-hidden="true"><circle cx="13" cy="13" r="11" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 9.5 L13 17.5 L19.5 9.5" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="13" cy="9.5" r="2" fill="currentColor" opacity="0.3"/></svg>
+    <span class="logo-name">Volta</span>
+  </a>
+  <div class="coll-badge">Collection: <span id="coll-disp">After the Flood</span>
+    <button class="ib" onclick="openRename()" aria-label="Rename collection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+  </div>
+  <nav class="topbar-tabs" role="tablist">
+    <button class="tab-btn active" onclick="sw('canvas')" id="t-canvas" role="tab" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Canvas</button>
+    <button class="tab-btn" onclick="sw('arc')" id="t-arc" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Arc</button>
+    <button class="tab-btn" onclick="sw('inspector')" id="t-inspector" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Transition</button>
+    <button class="tab-btn" onclick="sw('spine')" id="t-spine" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Spine</button>
+  </nav>
+  <div class="topbar-right">
+    <button class="btn btn-outline" onclick="openAdd()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Poem</button>
+    <button class="ib" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  </div>
+</header>
+<aside id="sidebar" aria-label="Poems">
+  <div class="sb-label">Poems</div>
+  <div class="sb-scroll" id="sb-list"></div>
+  <button class="sb-add" onclick="openAdd()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add poem</button>
+  <div class="sb-foot"><span class="sb-ct"><strong id="pc">0</strong> poems</span><button class="btn btn-ghost" onclick="shuffle()" style="font-size:var(--text-xs)">Shuffle</button></div>
+</aside>
+<main id="main">
+  <div class="panel active" id="canvas-panel">
+    <div class="cvs" id="cvs"><div class="cvs-grid"></div><div class="cvs-inner" id="cvs-inner"></div></div>
+    <div class="cvs-bar">
+      <button class="ib" onclick="arrange()" title="Auto-arrange" aria-label="Auto-arrange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button>
+      <div class="bsep"></div>
+      <button class="ib" onclick="openAdd()" title="Add poem" aria-label="Add poem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      <button class="ib" onclick="openGhost()" title="Ghost placeholder" aria-label="Add ghost placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg></button>
+      <div class="bsep"></div><span class="bhint">Drag cards · Reorder in sidebar</span>
+    </div>
+  </div>
+  <div class="panel" id="arc-panel">
+    <div class="arc-head"><h2 class="arc-h">Emotional Arc</h2><div class="arc-leg" id="arc-leg"></div></div>
+    <div class="arc-chart"><div style="font-size:var(--text-xs);color:var(--txf);margin-bottom:var(--sp3)">Register by sequence — hover to inspect</div><div class="arc-blocks" id="arc-blocks"></div></div>
+    <div class="arc-flags" id="arc-flags"></div>
+  </div>
+  <div class="panel" id="inspector-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <h2 class="ins-h">Transition Inspector</h2>
+      <div style="display:flex;align-items:center;gap:var(--sp3)">
+        <button class="ib" onclick="prevT()" aria-label="Previous transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <span class="ins-info" id="ins-info">1 → 2</span>
+        <button class="ib" onclick="nextT()" aria-label="Next transition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+      </div>
+    </div>
+    <div id="ins-body"></div>
+  </div>
+  <div class="panel" id="spine-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <h2 style="font-family:var(--fd);font-style:italic;font-size:var(--text-xl)">Manuscript Spine</h2>
+      <button class="btn btn-primary" onclick="printSpine()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Export / Print</button>
+    </div>
+    <div class="sdoc" id="sdoc"></div>
+  </div>
+</main>
+</div>
+<div class="moverlay" id="m-add"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="ml-add">
+  <h2 class="m-title" id="ml-add">Add a poem</h2>
+  <div class="mf"><label class="mlbl" for="np-t">Title</label><input class="mi" id="np-t" type="text" placeholder="e.g. Elegy for a Lighthouse"></div>
+  <div class="mf"><label class="mlbl" for="np-l">Opening line</label><input class="mi" id="np-l" type="text" placeholder="First line of the poem"></div>
+  <div class="mf"><label class="mlbl">Register</label><div class="mreg" id="mreg-add"></div></div>
+  <div class="mf"><label class="mlbl" for="np-tg">Tags (comma-separated)</label><input class="mi" id="np-tg" type="text" placeholder="e.g. water, grief, childhood"></div>
+  <div class="mf"><label class="mlbl" for="np-b">Poem text (optional)</label><textarea class="mi" id="np-b" style="min-height:88px;resize:vertical;line-height:1.7" placeholder="Paste or type the poem…"></textarea></div>
+  <div class="mfoot"><button class="btn btn-ghost" onclick="closeM()">Cancel</button><button class="btn btn-primary" onclick="addPoem()">Add poem</button></div>
+</div></div>
+<div class="moverlay" id="m-ghost"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="ml-g">
+  <h2 class="m-title" id="ml-g">Ghost placeholder</h2>
+  <p style="font-size:var(--text-sm);color:var(--txm);margin-bottom:var(--sp5);line-height:1.6">A placeholder for a poem not yet written — marks a structural gap.</p>
+  <div class="mf"><label class="mlbl" for="gn">What needs to exist here</label><textarea class="mi" id="gn" style="min-height:70px;resize:vertical" placeholder="e.g. Something about transition — neither grief nor acceptance."></textarea></div>
+  <div class="mf"><label class="mlbl">Register to hold</label><div class="mreg" id="mreg-ghost"></div></div>
+  <div class="mfoot"><button class="btn btn-ghost" onclick="closeM()">Cancel</button><button class="btn btn-primary" onclick="addGhost()">Add placeholder</button></div>
+</div></div>
+<div class="moverlay" id="m-rename"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="ml-r">
+  <h2 class="m-title" id="ml-r">Name your collection</h2>
+  <div class="mf"><label class="mlbl" for="cn">Collection title</label><input class="mi" id="cn" type="text" placeholder="e.g. After the Flood"></div>
+  <div class="mfoot"><button class="btn btn-ghost" onclick="closeM()">Cancel</button><button class="btn btn-primary" onclick="renC()">Save</button></div>
+</div></div>
+<script>
+const S={name:'After the Flood',view:'canvas',poems:[],sel:null,ti:0,ar:'dark',gr:'ambivalent'};
+const REGS=[{id:'dark',lab:'Elegiac',col:'#3d2e6e',lt:'#e1ddf0'},{id:'grief',lab:'Grief',col:'#b0394a',lt:'#fde8eb'},{id:'ambivalent',lab:'Ambivalent',col:'#7a6a58',lt:'#f0ece6'},{id:'questioning',lab:'Questioning',col:'#3a5a7a',lt:'#ddeaf5'},{id:'light',lab:'Light',col:'#3a6b4a',lt:'#dff0e7'},{id:'declarative',lab:'Declarative',col:'#c47a1a',lt:'#fdf0d8'}];
+const SEEDS=[
+  {id:'p1',title:'Shoreline Aubade',line:'The sea withdraws its tongue from the cold stones',reg:'light',tags:['water','morning','departure'],body:'The sea withdraws its tongue from the cold stones,\nleaves a film of light on everything it touched.\nI dressed before you woke.\nThe gulls had already made their announcements.',x:60,y:60,ann:'',ghost:false},
+  {id:'p2',title:'What the Inheritance Was',line:'Not money. Not land. The silence in the hallway',reg:'ambivalent',tags:['family','silence','grief'],body:'Not money. Not land. The silence in the hallway\nbetween your door and mine.\nThe specific weight of not speaking\nhanded down like silverware, still warm.',x:285,y:78,ann:'',ghost:false},
+  {id:'p3',title:'Apocrypha',line:'There are gospels no one wrote down',reg:'questioning',tags:['faith','doubt','memory'],body:'There are gospels no one wrote down:\nthe argument in the kitchen,\nhow you cried when the dog died, not the people.\nI am collecting them.',x:510,y:60,ann:'',ghost:false},
+  {id:'p4',title:'After the Flood (I)',line:'We stood in the house in the water',reg:'grief',tags:['water','loss','home'],body:'We stood in the house in the water.\nThe floorboards softened underfoot.\nYou said: well, this is it then.\nWe held the cat above the waterline.',x:110,y:280,ann:'',ghost:false},
+  {id:'p5',title:'Taxidermy',line:'The fox behind glass still runs',reg:'dark',tags:['death','time','preservation'],body:'The fox behind glass still runs.\nSomeone has arranged the fur\nso it seems to be arriving.\nNothing has actually arrived.',x:340,y:295,ann:'',ghost:false},
+  {id:'p6',title:'On Buying Back the House',line:'We signed the papers in a room that smelled of other people',reg:'declarative',tags:['home','return','hope'],body:'We signed the papers in a room that smelled of other people.\nThe solicitor had clean hands.\nI thought: we are allowed to want things.\nI thought: here.',x:565,y:278,ann:'',ghost:false},
+  {id:'p7',title:'Vigil',line:'Hospitals have a particular quality of night',reg:'grief',tags:['mortality','family','waiting'],body:'Hospitals have a particular quality of night.\nThe clock does not behave.\nI was reading the same page for an hour\nbefore I noticed the light had changed.',x:185,y:500,ann:'',ghost:false},
+  {id:'p8',title:'The Swimmers',line:'Every morning they go in without fuss',reg:'light',tags:['ritual','water','body'],body:'Every morning they go in without fuss.\nThe cold receives them\nas if they had always been expected.\nI watch from the wall. Not yet.',x:440,y:512,ann:'',ghost:false}
+];
+const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';
+const rg=id=>REGS.find(r=>r.id===id)||REGS[0];
+function init(){S.poems=SEEDS.map(p=>({...p}));document.getElementById('coll-disp').textContent=S.name;render();buildP();updArc();updIns();updSpine();}
+let _theme='light';
+function toggleTheme(){_theme=_theme==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',_theme);const b=document.getElementById('theme-btn');b.innerHTML=_theme==='dark'?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';}
+function buildP(){['mreg-add','mreg-ghost'].forEach(cid=>{const cur=cid==='mreg-add'?S.ar:S.gr;document.getElementById(cid).innerHTML=REGS.map(r=>`<button class="mreg-b${r.id===cur?' sel':''}" style="background:${r.lt};color:${r.col}" onclick="pickR('${cid}','${r.id}')">${r.lab}</button>`).join('');});}
+function pickR(cid,id){if(cid==='mreg-add')S.ar=id;else S.gr=id;document.querySelectorAll('#'+cid+' .mreg-b').forEach(b=>b.classList.toggle('sel',b.getAttribute('onclick').includes("'"+id+"'")));}
+function render(){renderSB();renderCV();}
+function renderSB(){const l=document.getElementById('sb-list');document.getElementById('pc').textContent=S.poems.length;if(!S.poems.length){l.innerHTML='<div style="padding:var(--sp6) var(--sp4);font-size:var(--text-xs);color:var(--txf)">No poems yet.</div>';return;}l.innerHTML=S.poems.map((p,i)=>`<div class="sb-poem${S.sel===p.id?' sel':''} fu" onclick="doSel('${p.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')doSel('${p.id}')"><div class="reg-dot" style="background:${rg(p.reg).col}"></div><div class="sb-body"><div class="sb-title">${p.ghost?'[ghost] ':''}${esc(p.title)}</div><div class="sb-line">${esc(p.line||'')}</div></div><span class="sb-num">${String(i+1).padStart(2,'0')}</span></div>`).join('');}
+function renderCV(){const ci=document.getElementById('cvs-inner');ci.innerHTML=S.poems.map((p,i)=>`<div class="pnode${S.sel===p.id?' sel':''}" id="n-${p.id}" style="left:${p.x}px;top:${p.y}px${p.ghost?';border:2px dashed var(--brd);background:var(--soff);opacity:.75':''}" onclick="doSel('${p.id}')" onmousedown="doDrag(event,'${p.id}')"><div class="pnode-top"><span class="rbadge" style="background:${rg(p.reg).lt};color:${rg(p.reg).col}">${rg(p.reg).lab}</span><span class="pnode-num">${String(i+1).padStart(2,'0')}</span></div><div class="pnode-title">${p.ghost?'[Ghost]<br>':''}${esc(p.title)}</div>${p.line&&!p.ghost?`<div class="pnode-line">${esc(p.line)}</div>`:''}<div class="pnode-tags">${(p.tags||[]).slice(0,3).map(t=>`<span class="pnode-tag">${esc(t)}</span>`).join('')}</div></div>`).join('');}
+function doDrag(e,id){if(e.button!==0)return;const nd=document.getElementById('n-'+id);const pm=S.poems.find(p=>p.id===id);if(!pm)return;const sf=document.getElementById('cvs');const sr=sf.getBoundingClientRect();const nr=nd.getBoundingClientRect();const ox=e.clientX-nr.left,oy=e.clientY-nr.top;nd.classList.add('dragging');let moved=false;function mv(ev){moved=true;pm.x=Math.max(0,ev.clientX-sr.left+sf.scrollLeft-ox);pm.y=Math.max(0,ev.clientY-sr.top+sf.scrollTop-oy);nd.style.left=pm.x+'px';nd.style.top=pm.y+'px';}function up(){nd.classList.remove('dragging');document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);if(moved){S.sel=id;renderSB();}}document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);e.preventDefault();}
+function doSel(id){S.sel=id;render();}
+function sw(v){S.view=v;['canvas','arc','inspector','spine'].forEach(n=>{document.getElementById(n+'-panel').classList.toggle('active',n===v);const t=document.getElementById('t-'+n);if(t){t.classList.toggle('active',n===v);t.setAttribute('aria-selected',n===v);}});if(v==='arc')updArc();if(v==='inspector')updIns();if(v==='spine')updSpine();}
+function updArc(){const ps=S.poems;const bl=document.getElementById('arc-blocks');const fl=document.getElementById('arc-flags');const lg=document.getElementById('arc-leg');if(!ps.length){bl.innerHTML='<div style="font-size:var(--text-xs);color:var(--txf);padding:var(--sp4)">No poems yet.</div>';fl.innerHTML='';lg.innerHTML='';return;}bl.innerHTML=ps.map((p,i)=>`<div class="arc-block" style="background:${rg(p.reg).lt};border:1.5px solid ${rg(p.reg).col}40" onclick="doSel('${p.id}');sw('canvas')"><div class="arc-tt">${String(i+1).padStart(2,'0')} — ${esc(p.title)}<br>${rg(p.reg).lab}</div></div>`).join('');const us=[...new Set(ps.map(p=>p.reg))];lg.innerHTML=us.map(r=>`<div class="leg-item"><div class="leg-dot" style="background:${rg(r).col}"></div>${rg(r).lab}</div>`).join('');let fh='',mr=1,cr=1;for(let i=1;i<ps.length;i++){if(ps[i].reg===ps[i-1].reg)cr++;else cr=1;mr=Math.max(mr,cr);}if(mr>=4)fh+=`<div class="arc-flag warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--amber)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div><div class="af-t">Tonal flatness detected</div><div class="af-d">${mr} consecutive poems share the same register. Consider inserting a contrasting piece.</div></div></div>`;const gc=ps.filter(p=>p.ghost).length;if(gc)fh+=`<div class="arc-flag info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><div><div class="af-t">${gc} ghost placeholder${gc!==1?'s':''}</div><div class="af-d">${gc} unwritten poem${gc!==1?'s':''} holding structural space in the sequence.</div></div></div>`;const lr=ps[ps.length-1]?.reg;if(lr==='grief'||lr==='dark')fh+=`<div class="arc-flag info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div><div class="af-t">Heavy close</div><div class="af-d">Your final poem is in a dark register — is that the intended ending note?</div></div></div>`;if(!fh)fh=`<div class="arc-flag ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--sage)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div><div class="af-t">Arc looks healthy</div><div class="af-d">Good register variety — no structural issues detected.</div></div></div>`;fl.innerHTML=fh;}
+function updIns(){const ps=S.poems.filter(p=>!p.ghost);const inf=document.getElementById('ins-info');const bd=document.getElementById('ins-body');if(ps.length<2){inf.textContent='—';bd.innerHTML='<div class="empty"><p>Add at least two poems to inspect transitions.</p></div>';return;}S.ti=Math.max(0,Math.min(S.ti,ps.length-2));const a=ps[S.ti],b=ps[S.ti+1];inf.textContent=String(S.ti+1).padStart(2,'0')+' → '+String(S.ti+2).padStart(2,'0');const aL=(a.body||a.line||'').split('\n').filter(Boolean);const bL=(b.body||b.line||'').split('\n').filter(Boolean);const l3=aL.slice(-3),f3=bL.slice(0,3);const sh=(a.tags||[]).filter(t=>(b.tags||[]).includes(t));const ts=a.reg!==b.reg;const ec=a.tags?.some(t=>(b.body||b.line||'').toLowerCase().includes(t));const chips=[sh.length?`<span class="chip chip-echo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Shared motif: ${sh.join(', ')}</span>`:'',ts?`<span class="chip chip-shift"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Tonal shift: ${rg(a.reg).lab} → ${rg(b.reg).lab}</span>`:`<span class="chip chip-risk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Same register — risk of flatness</span>`,ec?`<span class="chip chip-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Image echo detected</span>`:''].filter(Boolean).join('');bd.innerHTML=`<div class="tr-pair fu"><div class="tr-card"><div class="tr-lbl">Poem ${String(S.ti+1).padStart(2,'0')} — closing lines</div><div class="tr-title">${esc(a.title)}</div><div class="tr-lines">${l3.map((l,i)=>`<div class="tr-line${i===l3.length-1?' hi':' fd'}">${esc(l)}</div>`).join('')}</div></div><div class="tr-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div><div class="tr-card"><div class="tr-lbl">Poem ${String(S.ti+2).padStart(2,'0')} — opening lines</div><div class="tr-title">${esc(b.title)}</div><div class="tr-lines">${f3.map((l,i)=>`<div class="tr-line${i===0?' hi':' fd'}">${esc(l)}</div>`).join('')}</div></div></div><div class="tr-notes fu"><div class="tr-notes-t">Observations</div><div class="chips">${chips||'<span style="font-size:var(--text-xs);color:var(--txf)">No automatic observations for this pair.</span>'}</div><textarea class="tr-ann" placeholder="Your notes on this transition…" oninput="svAnn('${a.id}',this.value)">${esc(a.ann||'')}</textarea></div>`;}
+function prevT(){S.ti=Math.max(0,S.ti-1);updIns();}function nextT(){const max=S.poems.filter(p=>!p.ghost).length-2;S.ti=Math.min(max,S.ti+1);updIns();}
+function svAnn(id,v){const p=S.poems.find(x=>x.id===id);if(p)p.ann=v;}
+function updSpine(){const dc=document.getElementById('sdoc');const ps=S.poems;if(!ps.length){dc.innerHTML='<div class="empty"><p>Add poems to generate your manuscript spine.</p></div>';return;}const now=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});dc.innerHTML=`<div class="s-title">${esc(S.name)}</div><div class="s-sub">Manuscript spine &middot; ${ps.length} poem${ps.length!==1?'s':''} &middot; ${now}</div><div class="s-div"></div><div class="s-sec">Sequence</div>${ps.map((p,i)=>`<div class="s-row"><div class="s-n">${String(i+1).padStart(2,'0')}</div><div class="s-m"><div class="s-name">${p.ghost?'[ Ghost ] ':''}${esc(p.title)}</div>${p.line&&!p.ghost?`<div class="s-line">${esc(p.line)}</div>`:''}</div><div class="s-r"><span class="s-pill" style="background:${rg(p.reg).lt};color:${rg(p.reg).col}">${rg(p.reg).lab}</span>${p.tags&&p.tags.length?`<div class="s-nt">${esc(p.tags.join(', '))}</div>`:''}</div></div>`).join('')}<div class="s-div"></div><div style="font-size:var(--text-xs);color:var(--txf)">Generated by Volta</div>`;}
+function openAdd(){buildP();S.ar='dark';['np-t','np-l','np-tg'].forEach(id=>document.getElementById(id).value='');document.getElementById('np-b').value='';openM('m-add');}
+function openGhost(){buildP();S.gr='ambivalent';document.getElementById('gn').value='';openM('m-ghost');}
+function openRename(){document.getElementById('cn').value=S.name;openM('m-rename');}
+function openM(id){document.querySelectorAll('.moverlay').forEach(m=>m.classList.remove('open'));const m=document.getElementById(id);m.classList.add('open');const fn=m.querySelector('input,textarea');if(fn)setTimeout(()=>fn.focus(),60);}
+function closeM(){document.querySelectorAll('.moverlay').forEach(m=>m.classList.remove('open'));}
+document.addEventListener('click',e=>{document.querySelectorAll('.moverlay.open').forEach(m=>{if(e.target===m)closeM();});});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();});
+function addPoem(){const t=document.getElementById('np-t').value.trim()||'Untitled';const l=document.getElementById('np-l').value.trim();const rw=document.getElementById('np-tg').value.trim();const b=document.getElementById('np-b').value.trim();const tags=rw?rw.split(',').map(x=>x.trim()).filter(Boolean):[];const id='p'+Date.now();const i=S.poems.length;S.poems.push({id,title:t,line:l,reg:S.ar,tags,body:b,x:60+(i%4)*230,y:60+Math.floor(i/4)*210,ann:'',ghost:false});closeM();render();updArc();updSpine();doSel(id);}
+function addGhost(){const n=document.getElementById('gn').value.trim()||'Unwritten poem';const id='g'+Date.now();const i=S.poems.length;S.poems.push({id,title:n.length>44?n.slice(0,44)+'…':n,line:'[ placeholder — not yet written ]',reg:S.gr,tags:[],body:'',x:60+(i%4)*230,y:60+Math.floor(i/4)*210,ann:'',ghost:true});closeM();render();updArc();updSpine();}
+function renC(){const v=document.getElementById('cn').value.trim();if(!v)return;S.name=v;document.getElementById('coll-disp').textContent=v;closeM();updSpine();}
+function arrange(){S.poems.forEach((p,i)=>{p.x=60+(i%4)*230;p.y=60+Math.floor(i/4)*210;});renderCV();}
+function shuffle(){for(let i=S.poems.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[S.poems[i],S.poems[j]]=[S.poems[j],S.poems[i]];}render();updArc();updIns();updSpine();}
+function printSpine(){const h=document.getElementById('sdoc').innerHTML;const w=window.open('','_blank');if(!w)return;w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+esc(S.name)+'</title><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"><style>body{font-family:\'DM Sans\',sans-serif;max-width:680px;margin:40px auto;padding:40px;color:#1e1c17;font-size:13px;line-height:1.7}.s-title{font-family:\'Instrument Serif\',serif;font-style:italic;font-size:2rem;letter-spacing:-0.02em;margin-bottom:4px}.s-sub{color:#888;font-size:11px;margin-bottom:24px}.s-div{border:none;border-top:1px solid #e0ddd8;margin:18px 0}.s-sec{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#bbb;margin-bottom:12px;font-weight:700}.s-row{display:flex;gap:14px;padding:9px 0;border-bottom:1px solid #f3f1ee;align-items:flex-start}.s-n{font-size:10px;color:#ccc;width:20px;flex-shrink:0}.s-m{flex:1}.s-name{font-family:\'Instrument Serif\',serif;font-style:italic;font-size:14px}.s-line{font-size:11px;color:#999;margin-top:1px}.s-r{flex-shrink:0;text-align:right}.s-pill{font-size:10px;padding:2px 7px;border-radius:20px;background:#f0ece6;color:#7a6a58}.s-nt{font-size:10px;color:#ccc;font-style:italic;margin-top:2px}@media print{body{margin:0;padding:24px}}</style></head><body>'+h+'</body></html>');w.document.close();setTimeout(()=>w.print(),500);}
+init();
+</script>
+</body>
+</html>
