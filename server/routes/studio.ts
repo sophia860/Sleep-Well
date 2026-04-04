@@ -1,14 +1,11 @@
 import type { Express } from "express";
 import { db } from "../db";
 import { eq, and } from "drizzle-orm";
+import { exhibits } from "@shared/schema";
 
 export function registerStudioRoutes(app: Express) {
   app.get("/api/studio/products", async (_req, res) => {
     try {
-      const { db } = await import("../db");
-      // Use exhibits table as studio products (slug, title, subtitle, price, isPublished)
-      const { exhibits } = await import("../shared/schema");
-      const { eq } = await import("drizzle-orm");
       const products = await db
         .select()
         .from(exhibits)
@@ -23,9 +20,6 @@ export function registerStudioRoutes(app: Express) {
 
   app.get("/api/studio/products/:slug", async (req, res) => {
     try {
-      const { db } = await import("../db");
-      const { exhibits } = await import("../shared/schema");
-      const { eq, and } = await import("drizzle-orm");
       const [product] = await db
         .select()
         .from(exhibits)

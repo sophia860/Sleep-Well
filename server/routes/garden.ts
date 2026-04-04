@@ -695,9 +695,6 @@ export function registerGardenRoutes(app: Express) {
 
   app.get("/api/garden/entries", async (_req, res) => {
     try {
-      const { db } = await import("../db");
-      const { writings, users } = await import("../shared/schema");
-      const { eq, and, desc } = await import("drizzle-orm");
       const entries = await db
         .select({
           id: writings.id,

@@ -4,6 +4,25 @@ import { storage } from "../storage";
 import { db } from "../db";
 import { courses, courseLessons } from "@shared/schema";
 
+async function verifyCourseAccess(
+  userId: string,
+  courseId: string,
+  lessonId: string,
+): Promise<{ ok: boolean; message?: string }> {
+  const course = await storage.getCourse(courseId);
+  if (!course) return { ok: false, message: "Course not found" };
+  const lesson = await storage.getCourseLesson(lessonId);
+  if (!lesson || lesson.courseId !== courseId)
+    return { ok: false, message: "Lesson not found in this course" };
+  const purchased = await storage.hasUserCourseAccess(userId, courseId);
+  const user = await storage.getUser(userId);
+  const isCultivator = user?.tier === "cultivator";
+  if (!purchased && !(isCultivator && course.includedInCultivator)) {
+    return { ok: false, message: "You don't have access to this course" };
+  }
+  return { ok: true };
+}
+
 export function registerCoursesRoutes(app: Express) {
   app.get("/api/courses", async (req: any, res) => {
     try {
