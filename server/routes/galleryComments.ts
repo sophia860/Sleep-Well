@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { galleryComments, users } from "@shared/schema";
 

@@ -1,7 +1,6 @@
 import type { Express } from "express";
 import { isAuthenticated } from "../replit_integrations/auth";
 import { storage } from "../storage";
-import { letters } from "@shared/schema";
 
 export function registerWriterProfilesRoutes(app: Express) {
   app.get("/api/credits", isAuthenticated, async (req: any, res) => {

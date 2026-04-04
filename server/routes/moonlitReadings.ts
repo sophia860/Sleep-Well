@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { isAuthenticated } from "../replit_integrations/auth";
 import { storage } from "../storage";
+import { z } from "zod";
 import { insertMoonlitReadingSchema } from "@shared/schema";
 
 export function registerMoonlitReadingsRoutes(app: Express) {

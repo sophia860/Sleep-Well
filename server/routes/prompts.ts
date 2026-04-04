@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { isAuthenticated } from "../replit_integrations/auth";
 import { storage } from "../storage";
+import { db } from "../db";
 import { and, sql } from "drizzle-orm";
 import { dailyPrompts } from "@shared/schema";
 

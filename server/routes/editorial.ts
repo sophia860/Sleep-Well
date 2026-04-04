@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { isAuthenticated } from "../replit_integrations/auth";
 import { isEditor } from "./middleware";
 import { storage } from "../storage";
+import { z } from "zod";
 import { insertGreenhouseEntrySchema, insertPublishRequestSchema, insertRequestMessageSchema, insertIssueSchema, insertIssuePieceSchema, insertEditorNoteSchema, writings } from "@shared/schema";
 
 export function registerEditorialRoutes(app: Express) {

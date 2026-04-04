@@ -3,6 +3,7 @@ import { isAuthenticated } from "../replit_integrations/auth";
 import { storage } from "../storage";
 import { db } from "../db";
 import { eq, and, desc } from "drizzle-orm";
+import { z } from "zod";
 import { insertCompostSchema, insertGrowthJournalSchema, insertInnerWeatherSchema, insertReflectionSchema, insertIdeaDropSchema, users, writings, reflections } from "@shared/schema";
 
 export function registerGardenRoutes(app: Express) {
