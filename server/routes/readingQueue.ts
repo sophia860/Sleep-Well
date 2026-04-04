@@ -1,79 +1,179 @@
-import { Router } from "express";
-import { db } from "../db";
-import { eq, desc } from "drizzle-orm";
+import type { Express } from "express";
+import { isAuthenticated } from "../replit_integrations/auth";
+import { storage } from "../storage";
+import { z } from "zod";
+import { insertReadingQueueSchema, insertSavedPieceSchema, insertReadingShelfSchema } from "@shared/schema";
 
-const router = Router();
+export function registerReadingQueueRoutes(app: Express) {
+  app.get("/api/reading-queue", isAuthenticated, async (req: any, res) => {
+    try {
+      const items = await storage.getReadingQueue(req.user.id);
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch reading queue" });
+    }
+  });
 
-function requireAuth(req: any, res: any, next: any) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  next();
+  app.post("/api/reading-queue", isAuthenticated, async (req: any, res) => {
+    try {
+      const parsed = insertReadingQueueSchema.safeParse(req.body);
+      if (!parsed.success)
+        return res
+          .status(400)
+          .json({ message: "Invalid data", errors: parsed.error.flatten() });
+      const item = await storage.addToReadingQueue(
+        req.user.id,
+        parsed.data.writingId,
+      );
+      res.status(201).json(item);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to add to reading queue" });
+    }
+  });
+
+  app.delete(
+    "/api/reading-queue/:id",
+    isAuthenticated,
+    async (req: any, res) => {
+      try {
+        const deleted = await storage.removeFromReadingQueue(
+          req.user.id,
+          req.params.id,
+        );
+        if (!deleted) return res.status(404).json({ message: "Not found" });
+        res.json({ message: "Removed" });
+      } catch (error) {
+        res.status(500).json({ message: "Failed to remove" });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/reading-queue/:id/read",
+    isAuthenticated,
+    async (req: any, res) => {
+      try {
+        const item = await storage.markQueueItemRead(
+          req.user.id,
+          req.params.id,
+        );
+        if (!item) return res.status(404).json({ message: "Not found" });
+        res.json(item);
+      } catch (error) {
+        res.status(500).json({ message: "Failed to update" });
+      }
+    },
+  );
+
+  app.post("/api/reading-notes", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const schema = z.object({
+        sourceWritingId: z.string(),
+        sourceTitle: z.string().optional(),
+        highlightText: z.string().optional(),
+        note: z.string().min(1),
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success)
+        return res
+          .status(400)
+          .json({ message: "Invalid data", errors: parsed.error.flatten() });
+
+      const { sourceWritingId, sourceTitle, highlightText, note } = parsed.data;
+
+      const contentParts: string[] = [];
+      if (highlightText) {
+        contentParts.push(`<blockquote><p>${highlightText}</p></blockquote>`);
+      }
+      contentParts.push(`<p>${note}</p>`);
+      if (sourceTitle) {
+        contentParts.push(
+          `<p><em>— Reading note from "${sourceTitle}"</em></p>`,
+        );
+      }
+
+      const title = highlightText
+        ? `Note: "${highlightText.slice(0, 60)}${highlightText.length > 60 ? "…" : ""}"`
+        : `Reading note on "${sourceTitle || "a piece"}"`;
+
+      const writing = await storage.createWriting(userId, {
+        title,
+        content: contentParts.join("\n"),
+        stage: "seed",
+        genre: "fragment",
+        tags: ["reading-note", `source:${sourceWritingId}`],
+      });
+
+      res.status(201).json(writing);
+    } catch (error) {
+      console.error("Error creating reading note:", error);
+      res.status(500).json({ message: "Failed to create reading note" });
+    }
+  });
+
+  app.get("/api/saved", isAuthenticated, async (req: any, res) => {
+    try {
+      const items = await storage.getSavedPieces(req.user.id);
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch saved pieces" });
+    }
+  });
+
+  app.post("/api/saved", isAuthenticated, async (req: any, res) => {
+    try {
+      const parsed = insertSavedPieceSchema.safeParse(req.body);
+      if (!parsed.success)
+        return res
+          .status(400)
+          .json({ message: "Invalid data", errors: parsed.error.flatten() });
+      const item = await storage.savePiece(
+        req.user.id,
+        parsed.data.writingId,
+      );
+      res.status(201).json(item);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to save piece" });
+    }
+  });
+
+  app.delete("/api/saved/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const deleted = await storage.unsavePiece(
+        req.user.id,
+        req.params.id,
+      );
+      if (!deleted) return res.status(404).json({ message: "Not found" });
+      res.json({ message: "Removed" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to remove" });
+    }
+  });
+
+  app.get("/api/reading-shelf", isAuthenticated, async (req, res) => {
+    try {
+      const entries = await storage.getReadingShelf();
+      res.json(entries);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch reading shelf" });
+    }
+  });
+
+  app.post("/api/reading-shelf", isAuthenticated, async (req: any, res) => {
+    try {
+      const parsed = insertReadingShelfSchema.safeParse(req.body);
+      if (!parsed.success)
+        return res.status(400).json({ message: "Invalid data" });
+      const entry = await storage.addToReadingShelf(req.user.id, {
+        bookTitle: parsed.data.bookTitle,
+        author: parsed.data.author ?? undefined,
+        reaction: parsed.data.reaction,
+      });
+      res.status(201).json(entry);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to add to reading shelf" });
+    }
+  });
+
 }
-
-// GET reading queue for current user
-router.get("/", requireAuth, async (req: any, res: any) => {
-  try {
-    const results = await db.query.readingQueue.findMany({
-      where: (r: any, { eq: eqOp }: any) => eqOp(r.userId, req.user.id),
-      orderBy: (r: any) => [desc(r.addedAt)],
-    });
-    res.json(results);
-  } catch (error: any) {
-    res.status(500).json({ error: "Failed to fetch reading queue" });
-  }
-});
-
-// POST add to reading queue
-router.post("/", requireAuth, async (req: any, res: any) => {
-  try {
-    const { writingId } = req.body;
-    if (!writingId) return res.status(400).json({ error: "writingId required" });
-    const schema = await import("@shared/schema");
-    const [item] = await db.insert(schema.readingQueue).values({
-      userId: req.user.id,
-      writingId,
-    }).returning();
-    res.status(201).json(item);
-  } catch (error: any) {
-    res.status(500).json({ error: "Failed to add to reading queue" });
-  }
-});
-
-// PUT mark as read/unread
-router.put("/:id", requireAuth, async (req: any, res: any) => {
-  try {
-    const { id } = req.params;
-    const existing = await db.query.readingQueue.findFirst({
-      where: (r: any, { eq: eqOp }: any) => eqOp(r.id, id),
-    });
-    if (!existing) return res.status(404).json({ error: "Item not found" });
-    if (existing.userId !== req.user.id) return res.status(403).json({ error: "Forbidden" });
-    const { isRead } = req.body;
-    const schema = await import("@shared/schema");
-    const [updated] = await db.update(schema.readingQueue)
-      .set({ isRead })
-      .where(eq(schema.readingQueue.id, id))
-      .returning();
-    res.json(updated);
-  } catch (error: any) {
-    res.status(500).json({ error: "Failed to update reading queue item" });
-  }
-});
-
-// DELETE remove from reading queue
-router.delete("/:id", requireAuth, async (req: any, res: any) => {
-  try {
-    const { id } = req.params;
-    const existing = await db.query.readingQueue.findFirst({
-      where: (r: any, { eq: eqOp }: any) => eqOp(r.id, id),
-    });
-    if (!existing) return res.status(404).json({ error: "Item not found" });
-    if (existing.userId !== req.user.id) return res.status(403).json({ error: "Forbidden" });
-    const schema = await import("@shared/schema");
-    await db.delete(schema.readingQueue).where(eq(schema.readingQueue.id, id));
-    res.status(204).send();
-  } catch (error: any) {
-    res.status(500).json({ error: "Failed to remove from reading queue" });
-  }
-});
-
-export default router;
