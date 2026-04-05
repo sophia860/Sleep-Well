@@ -154,3 +154,18 @@ Developer documentation.
 ### Build
 - `npm run build` runs `script/build.ts` which bundles both client (Vite) and server (esbuild)
 - Output: `dist/public/` (client), `dist/index.js` (server)
+
+
+---
+
+## Organisation Pass
+
+Completed: 2026-04-05 | Branch: `repo-organisation-2026-04-05`
+
+Changes made in this pass:
+- Moved `src/components/TakeoverScreen.tsx` (root-level stub) to `client/src/components/TakeoverScreen.tsx`
+- Deleted the misplaced root `src/components/` directory
+- Created `README.md` at repo root with full getting-started guide
+- Created `docs/repo-structure.md` (this file)
+- Created `docs/deadweight.md` documenting 17 unrouted pages
+- Created `docs/tests-status.md` documenting test/lint status
