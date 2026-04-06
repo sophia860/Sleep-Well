@@ -59,15 +59,15 @@ function ZoneNav({ active, onChange }: { active: Zone; onChange: (z: Zone) => vo
 
   return (
     <div className="w-full max-w-3xl">
-      <div className="grid grid-cols-2 gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-2 sm:grid-cols-5">
+      <div className="grid grid-cols-3 gap-1.5 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-2 sm:grid-cols-6">
         {zones.map((z) => (
           <button
             key={z.id}
             onClick={() => onChange(z.id)}
-            className={`relative flex min-h-[4rem] flex-col items-start justify-center gap-1 rounded-xl border px-3 py-2 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 ${
+            className={`relative flex min-h-[4rem] flex-col items-start justify-center gap-1 rounded-xl border px-3 py-2 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 ${
               active === z.id
-                ? "border-emerald-500/30 bg-white/[0.08] text-white/90"
-                : "border-white/[0.06] bg-transparent text-white/65 hover:border-white/[0.14] hover:text-white/85"
+                ? "border-white/[0.15] bg-white/[0.1] text-white/95"
+                : "border-white/[0.05] bg-transparent text-white/55 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white/80"
             }`}
             data-testid={`zone-tab-${z.id}`}
           >
@@ -82,7 +82,7 @@ function ZoneNav({ active, onChange }: { active: Zone; onChange: (z: Zone) => vo
               {z.icon}
               <span>{z.label}</span>
             </span>
-            <span className="relative z-10 text-xs leading-4 text-white/60">{z.desc}</span>
+            <span className="relative z-10 hidden text-xs leading-4 text-white/50 sm:block">{z.desc}</span>
           </button>
         ))}
       </div>
@@ -463,7 +463,7 @@ function DeskZone({ writings, onOpenWriting, onCreateNew, onOpenPlanting, onQuic
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search your pieces..."
-            className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] py-3 pl-10 pr-4 text-sm text-white/80 placeholder:text-white/40 focus:outline-none focus:border-white/[0.16] transition-colors"
+            className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] py-3 pl-10 pr-4 text-sm text-white/80 placeholder:text-white/40 focus:outline-none focus:border-emerald-600/40 focus:ring-2 focus:ring-emerald-500/20 transition-all"
             data-testid="input-search"
           />
         </div>
@@ -473,15 +473,15 @@ function DeskZone({ writings, onOpenWriting, onCreateNew, onOpenPlanting, onQuic
               key={f.id}
               onClick={() => setActiveFilter(f.id)}
               title={f.tip}
-              className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 font-mono text-[9px] uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 font-mono text-[9px] uppercase tracking-widest transition-all duration-150 ${
                 activeFilter === f.id
-                  ? "border-emerald-500/25 bg-white/[0.08] text-white/90"
-                  : "border-transparent text-white/60 hover:border-white/[0.08] hover:text-white/85"
+                  ? "border-emerald-500/40 bg-emerald-900/30 text-emerald-100/90 shadow-[0_0_8px_rgba(52,211,153,0.08)]"
+                  : "border-transparent text-white/45 hover:border-white/[0.08] hover:bg-white/[0.04] hover:text-white/75"
               }`}
               data-testid={`filter-${f.id}`}
             >
               {f.label}
-              <span className={`text-[8px] ${activeFilter === f.id ? "text-white/70" : "text-white/40"}`}>{f.count}</span>
+              <span className={`text-[8px] ${activeFilter === f.id ? "text-emerald-300/70" : "text-white/30"}`}>{f.count}</span>
             </button>
           ))}
         </div>
@@ -497,7 +497,7 @@ function DeskZone({ writings, onOpenWriting, onCreateNew, onOpenPlanting, onQuic
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-full font-mono text-[8px] uppercase tracking-widest border transition-all ${
                   activeTag === tag
                     ? "border-violet-500/30 bg-violet-500/10 text-violet-300/80"
-                    : "border-white/[0.08] text-white/90 hover:text-white/90 hover:border-white/15"
+                    : "border-white/[0.08] text-white/50 hover:text-white/75 hover:border-white/15"
                 }`}
                 data-testid={`tag-filter-${tag}`}
               >
@@ -506,7 +506,7 @@ function DeskZone({ writings, onOpenWriting, onCreateNew, onOpenPlanting, onQuic
               </button>
             ))}
             {activeTag && (
-              <button onClick={() => setActiveTag(null)} className="text-white/90 hover:text-white/90 transition-colors" data-testid="clear-tag-filter">
+              <button onClick={() => setActiveTag(null)} className="text-white/40 hover:text-white/70 transition-colors" data-testid="clear-tag-filter">
                 <X size={12} />
               </button>
             )}
@@ -530,16 +530,22 @@ function DeskZone({ writings, onOpenWriting, onCreateNew, onOpenPlanting, onQuic
       </div>
 
       {writings.length === 0 && (
-        <div className="relative border border-dashed border-emerald-700/20 rounded-3xl p-16 text-center space-y-6 overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 80%, rgba(6,78,59,0.08) 0%, transparent 60%)" }} />
-          <div className="relative flex items-center justify-center gap-6">
-            <SeedIcon className="w-8 h-8 text-amber-400/20" />
-            <SproutIcon className="w-10 h-10 text-emerald-400/20" />
-            <BloomIcon className="w-8 h-8 text-pink-400/20" />
+        <div className="relative border border-dashed border-emerald-700/20 rounded-3xl p-14 md:p-20 text-center space-y-8 overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 80%, rgba(6,78,59,0.1) 0%, transparent 60%)" }} />
+          <div className="relative flex items-center justify-center gap-8">
+            <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0 }}>
+              <SeedIcon className="w-8 h-8 text-amber-400/25" />
+            </motion.div>
+            <motion.div animate={{ y: [0, -7, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}>
+              <SproutIcon className="w-11 h-11 text-emerald-400/25" />
+            </motion.div>
+            <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
+              <BloomIcon className="w-8 h-8 text-pink-400/25" />
+            </motion.div>
           </div>
-          <div className="relative space-y-2">
-            <h3 className="text-2xl font-semibold tracking-tight text-white/90">Your desk is empty</h3>
-            <p className="font-serif text-sm text-white/90 max-w-md mx-auto leading-relaxed">
+          <div className="relative space-y-3">
+            <h3 className="text-2xl font-display font-light italic text-white/70">Your desk is empty</h3>
+            <p className="font-serif text-sm text-white/45 max-w-md mx-auto leading-relaxed">
               Start with a note, a fragment, or a full draft. You can organize and share it later.
             </p>
           </div>
@@ -557,7 +563,7 @@ function DeskZone({ writings, onOpenWriting, onCreateNew, onOpenPlanting, onQuic
       )}
 
       {filteredWritings.length === 0 && writings.length > 0 && (
-        <p className="text-center py-12 font-serif text-white/90 text-sm">No pieces match your search.</p>
+        <p className="text-center py-12 font-serif text-white/45 text-sm italic">No pieces match your search.</p>
       )}
 
       <div className="space-y-2">
@@ -640,14 +646,14 @@ function DeskZone({ writings, onOpenWriting, onCreateNew, onOpenPlanting, onQuic
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                       className="overflow-hidden"
                     >
                       <div className="px-4 md:px-5 pb-4 md:pb-5 ml-10 space-y-3 relative z-10">
                         {w.content && (
                           <ContentRenderer content={w.content} maxLength={400} className="text-sm font-serif text-white/55 leading-relaxed line-clamp-4" />
                         )}
-                        <div className="flex items-center gap-3 text-white/90">
+                        <div className="flex items-center gap-3 text-white/60">
                           <span className="font-mono text-[9px] tracking-widest">{wordCount(w.content)} words</span>
                           <VisibilityBadge visibility={vis} readiness={readiness} editorialAvailable={w.editorialAvailable} compact />
                         </div>
@@ -1967,8 +1973,8 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
 
       {dailyLetter && (
         <div className="mb-10" data-testid="daily-letter-card">
-          <div className="rounded-2xl border border-amber-500/10 bg-amber-950/[0.06] p-7 md:p-9 space-y-5"
-            style={{ boxShadow: "0 0 40px rgba(245, 158, 11, 0.03)" }}
+          <div className="rounded-2xl border border-amber-500/15 bg-amber-950/[0.08] p-5 md:p-7 space-y-4"
+            style={{ boxShadow: "0 0 40px rgba(245, 158, 11, 0.04)" }}
           >
             <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-amber-400/50">
               Today's Letter
@@ -1985,7 +1991,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
                 </div>
                 <span className="font-serif text-sm">{dailyLetter.authorName || "Anonymous"}</span>
               </button>
-              <span className="font-mono text-[8px] text-white/90">{timeAgo(dailyLetter.createdAt)}</span>
+              <span className="font-mono text-[8px] text-white/40">{timeAgo(dailyLetter.createdAt)}</span>
             </div>
 
             <h3 className="text-2xl md:text-3xl font-semibold tracking-tight text-white/90 leading-snug" data-testid="daily-letter-title">
@@ -2013,8 +2019,8 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
               <div className="flex items-center gap-3">
                 <QuietReadButton writingId={dailyLetter.id} />
                 <span className="w-px h-3 bg-white/[0.06]" />
-                <span className="font-mono text-[8px] uppercase tracking-widest text-white/90">{dailyLetter.genre}</span>
-                <span className="font-mono text-[8px] text-white/90">{dailyLetterContentWords} words</span>
+                <span className="font-mono text-[8px] uppercase tracking-widest text-white/40">{dailyLetter.genre}</span>
+                <span className="font-mono text-[8px] text-white/40">{dailyLetterContentWords} words</span>
                 <div className="ml-auto">
                   <TendButton gardenerId={dailyLetter.authorId} size="sm" />
                 </div>
@@ -2036,7 +2042,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
         </div>
       )}
 
-      <div className="relative mb-4"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/35" /><input type="text" value={readingRoomSearch} onChange={(e) => { setReadingRoomSearch(e.target.value); setPage(1); }} placeholder="Search by title, author, or keyword..." className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] py-3 pl-9 pr-4 text-sm text-white/80 placeholder:text-white/35 outline-none transition-all focus:border-white/[0.16]" data-testid="input-reading-room-search" /></div><CuratedOpportunitiesBanner />
+      <div className="relative mb-4"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/35" /><input type="text" value={readingRoomSearch} onChange={(e) => { setReadingRoomSearch(e.target.value); setPage(1); }} placeholder="Search by title, author, or keyword..." className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] py-3 pl-9 pr-4 text-sm text-white/80 placeholder:text-white/35 outline-none transition-all focus:border-emerald-600/40 focus:ring-2 focus:ring-emerald-500/20" data-testid="input-reading-room-search" /></div><CuratedOpportunitiesBanner />
 
       <div className="flex flex-col items-center gap-3 mb-8">
         <div className="flex items-center gap-1.5 flex-wrap justify-center">
@@ -2044,10 +2050,10 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
             <button
               key={s.id}
               onClick={() => { setActiveSort(s.id); setPage(1); }}
-              className={`px-3 py-1.5 rounded-full font-mono text-[9px] uppercase tracking-widest transition-all border ${
+              className={`px-3 py-1.5 rounded-full font-mono text-[9px] uppercase tracking-widest transition-all duration-150 border ${
                 activeSort === s.id
-                  ? "border-amber-500/30 bg-amber-500/10 text-amber-300/90"
-                  : "border-white/[0.06] text-white/60 hover:text-white/85 hover:border-white/15"
+                  ? "border-emerald-500/40 bg-emerald-900/30 text-emerald-100/90 shadow-[0_0_8px_rgba(52,211,153,0.08)]"
+                  : "border-white/[0.06] text-white/50 hover:text-white/80 hover:border-white/[0.12] hover:bg-white/[0.03]"
               }`}
               data-testid={`sort-${s.id}`}
             >
@@ -2060,10 +2066,10 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
             <button
               key={g}
               onClick={() => { setGenreFilter(g); setPage(1); }}
-              className={`px-2.5 py-1 rounded-full font-mono text-[9px] uppercase tracking-widest transition-all border ${
+              className={`px-2.5 py-1 rounded-full font-mono text-[9px] uppercase tracking-widest transition-all duration-150 border ${
                 genreFilter === g
-                  ? "border-amber-500/30 bg-amber-500/10 text-amber-300/90"
-                  : "border-transparent text-white/55 hover:text-white/85"
+                  ? "border-amber-500/35 bg-amber-500/10 text-amber-200/90"
+                  : "border-transparent text-white/40 hover:text-white/70 hover:border-white/[0.06]"
               }`}
               data-testid={`genre-filter-${g}`}
             >
@@ -2077,8 +2083,8 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
         <div className="relative border border-dashed border-emerald-700/15 rounded-3xl p-16 text-center space-y-4 overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 80%, rgba(6,78,59,0.06) 0%, transparent 60%)" }} />
           <Feather size={32} className="relative mx-auto text-emerald-500/25" />
-          <h3 className="relative text-xl font-semibold tracking-tight text-white/90">No letters yet</h3>
-          <p className="relative font-serif text-sm text-white/90 max-w-sm mx-auto leading-relaxed">
+          <h3 className="relative text-xl font-display font-light italic text-white/60">No letters yet</h3>
+          <p className="relative font-serif text-sm text-white/45 max-w-sm mx-auto leading-relaxed">
             When writers share their work to the garden, or you tend someone's garden, their pieces will appear here like letters slid under your door.
           </p>
         </div>
@@ -2086,11 +2092,8 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
 
       {allPieces.length > 0 && filteredPieces.length === 0 && (
         <div className="border border-dashed border-white/[0.06] rounded-2xl p-12 text-center space-y-3">
-3588
-3588
-
-          <Eye size={24} className="mx-auto text-white/90" />
-          <p className="font-serif text-sm text-white/90 italic">
+          <Eye size={24} className="mx-auto text-white/30" />
+          <p className="font-serif text-sm text-white/45 italic">
             {activeSort === "tended"
               ? "No pieces from writers you're tending yet. Tend a garden to see their work here."
               : "No pieces match this filter."}
@@ -2111,7 +2114,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
               data-testid={`letter-${piece.id}`}
             >
               <div className={`rounded-2xl border transition-all duration-300 ${
-                isExpanded ? "border-emerald-700/20 bg-emerald-950/20" : "border-transparent hover:border-emerald-800/15"
+                isExpanded ? "border-emerald-700/25 bg-emerald-950/25" : "border-white/[0.04] hover:border-emerald-700/25 hover:bg-emerald-950/[0.08]"
               }`}>
                 <div
                   role="button"
@@ -2135,7 +2138,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
                       </div>
                       <span className="font-serif text-xs">{piece.authorName || "Anonymous"}</span>
                     </span>
-                    <span className="font-mono text-[8px] text-white/90">{timeAgo(piece.updatedAt)}</span>
+                    <span className="font-mono text-[8px] text-white/40">{timeAgo(piece.updatedAt)}</span>
                   </div>
 
                   <h3 className="mb-2 text-lg md:text-xl font-semibold tracking-tight text-white/90 leading-snug">
@@ -2161,7 +2164,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
                                           <TendButton gardenerId={piece.authorId} />
                       <button
                         onClick={(e) => { e.stopPropagation(); setExpandedId(piece.id); }}
-                        className="flex items-center gap-1 font-mono text-[8px] text-white/90 hover:text-white/90 transition-colors"
+                        className="flex items-center gap-1 font-mono text-[8px] text-white/40 hover:text-white/70 transition-colors"
                         data-testid={`button-respond-${piece.id}`}
                       >
                         <MessageCircle size={9} />
@@ -2177,7 +2180,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                       className="overflow-hidden"
                     >
                       <div className="px-5 md:px-6 pb-5 md:pb-6 space-y-4">
@@ -2187,7 +2190,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
                             <PauseStoneButton writingId={piece.id} />
                             <span className="w-px h-3 bg-white/[0.06]" />
                             <span className="font-mono text-[8px] uppercase tracking-widest text-white/45">{piece.genre}</span>
-                            <span className="font-mono text-[8px] text-white/90">{wordCount(piece.content)} words</span>
+                            <span className="font-mono text-[8px] text-white/40">{wordCount(piece.content)} words</span>
                           </div>
                           <TendButton gardenerId={piece.authorId} size="sm" />
                         </div>
@@ -2352,8 +2355,8 @@ function CompostPileView() {
       {compostPile.length === 0 ? (
         <div className="border border-dashed border-amber-700/15 rounded-3xl p-16 text-center space-y-4">
           <Leaf size={32} className="mx-auto text-amber-500/20" />
-          <h3 className="text-xl font-display font-light italic text-white/90">The compost pile is empty</h3>
-          <p className="font-serif text-sm text-white/90 max-w-sm mx-auto leading-relaxed">
+          <h3 className="text-xl font-display font-light italic text-white/60">The compost pile is empty</h3>
+          <p className="font-serif text-sm text-white/45 max-w-sm mx-auto leading-relaxed">
             When writers compost pieces they're letting go of, fragments of language drift here.
             One person's abandoned darling becomes another's spark.
           </p>
@@ -3657,8 +3660,8 @@ export default function Garden() {
     <div className="min-h-screen garden-bg text-foreground relative overflow-x-hidden">
       <div className="relative z-10">
         <header className="sticky top-0 z-50 border-b border-white/[0.08] garden-header-bg">
-          <div className="max-w-5xl mx-auto px-6 py-3">
-            <div className="flex items-center justify-between gap-4">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3">
+            <div className="flex items-center justify-between gap-2 sm:gap-4">
               <a href="/" className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors group" data-testid="link-home">
                 <Home size={14} className="text-white/65 group-hover:text-white transition-colors" />
                 <span className="hidden sm:inline">Home</span>
@@ -3903,10 +3906,10 @@ export default function Garden() {
 
         <main className="pt-8 pb-24 px-6" onClick={() => { showProfileMenu && setShowProfileMenu(false); }}>
           {currentSeason && !isEditing && (
-            <div className="mb-6 rounded-2xl border border-emerald-500/10 bg-emerald-950/[0.04] p-4 text-center max-w-5xl mx-auto" data-testid="season-banner">
-              <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-emerald-400/40">{currentSeason.theme}</span>
-              <p className="font-display text-sm font-light italic text-white/90 mt-1">{currentSeason.name}</p>
-              {currentSeason.description && <p className="font-serif text-[11px] text-white/90 mt-1 max-w-md mx-auto leading-relaxed">{currentSeason.description}</p>}
+            <div className="mb-6 rounded-2xl border border-emerald-500/20 bg-emerald-950/[0.08] p-5 text-center max-w-5xl mx-auto" data-testid="season-banner" style={{ boxShadow: "0 0 30px rgba(52, 211, 153, 0.04)" }}>
+              <span className="font-mono text-[8px] uppercase tracking-[0.3em] text-emerald-400/55">{currentSeason.theme}</span>
+              <p className="font-display text-base font-light italic text-white/80 mt-1">{currentSeason.name}</p>
+              {currentSeason.description && <p className="font-serif text-[11px] text-white/50 mt-1.5 max-w-md mx-auto leading-relaxed">{currentSeason.description}</p>}
             </div>
           )}
           {activeWalk && (
