@@ -42,7 +42,7 @@ const FieldGuide = lazy(() => import("@/pages/FieldGuide"));
 const EditProfile = lazy(() => import("@/pages/EditProfile"));
 const GardenGuide = lazy(() => import("@/pages/GardenGuide"));
 const ContactEditors = lazy(() => import("@/pages/ContactEditors"));
-const NotFound = lazy(() => import("@/pages/not-found"));
+const NotFound = lazy(() => import("@/pages/not-found")); const Publications = lazy(() => import("@/pages/Publications"));
 const Opportunities = lazy(() => import("@/pages/Opportunities"));
 const Submissions = lazy(() => import("@/pages/Submissions"));
 const ForJournals = lazy(() => import("@/pages/ForJournals"));
@@ -132,10 +132,10 @@ function Router() {
         <Route path="/gallery" component={PageGallery} />
         <Route path="/piece/:id" component={Piece} />
         <Route path="/weave/:id" component={Weave} />
-        <Route path="/about" component={About} />
+        <Route path="/about" component={About} />           <Route path="/publications" component={Publications} />
         <Route path="/courses" component={Courses} />
         <Route path="/drafts">{() => <ProtectedRoute component={Drafts} path="/drafts" />}</Route>
-        <Route path="/editor-onboarding">{() => <ProtectedRoute component={EditorOnboarding} path="/editor-onboarding" />}</Route>
+                  <Route path="/editor-onboarding">{() => <EditorProtectedRoute component={EditorOnboarding} path="/editor-onboarding" />}</Route>
         <Route path="/exercise-admin">{() => <EditorProtectedRoute component={ExerciseAdmin} path="/exercise-admin" />}</Route>
         <Route path="/sign-in" component={SignIn} />
         <Route path="/privacy" component={Privacy} />
@@ -155,12 +155,12 @@ function Router() {
         <Route path="/dashboard">{() => <ProtectedRoute component={V2Dashboard} path="/dashboard" />}</Route>
         <Route path="/reading-room">{() => <ProtectedRoute component={V2ReadingRoom} path="/reading-room" />}</Route>
         <Route path="/community" component={V2Community} />
-        <Route path="/editorial-dashboard">{() => <ProtectedRoute component={EditorialDashboard} path="/editorial-dashboard" />}</Route>
+                <Route path="/editorial-dashboard">{() => <EditorProtectedRoute component={EditorialDashboard} path="/editorial-dashboard" />}</Route>
         <Route path="/eic-dashboard">
           {() => <Redirect to="/editorial-dashboard" />}
         </Route>
         <Route path="/editorial-payment">{() => <ProtectedRoute component={EditorialPayment} path="/editorial-payment" />}</Route>
-        <Route path="/editorial-room">{() => <ProtectedRoute component={EditorialRoom} path="/editorial-room" />}</Route>
+                <Route path="/editorial-room">{() => <EditorProtectedRoute component={EditorialRoom} path="/editorial-room" />}</Route>
         <Route path="/marketplace" component={Marketplace} />
                   <Route path="/atelier" component={Atelier} />
         <Route component={NotFound} />
