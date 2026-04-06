@@ -59,6 +59,10 @@ export default function EditorStudio() {
   const [requestEditorNote, setRequestEditorNote] = useState("");
   const [requestIssueId, setRequestIssueId] = useState("");
 
+  // Per-item publishing loading state
+  const [publishingWritingId, setPublishingWritingId] = useState<string | null>(null);
+  const [publishingIssueId, setPublishingIssueId] = useState<string | null>(null);
+
   // Core Data Queries
   const { data: writings = [], isFetching: isFetchingWritings } = useQuery<Writing[]>({
     queryKey: ["/api/editor/garden-stream"],
@@ -87,6 +91,9 @@ export default function EditorStudio() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/editor/garden-stream"] });
     },
+    onSettled: () => {
+      setPublishingWritingId(null);
+    },
   });
 
   const publishIssueMutation = useMutation({
@@ -94,6 +101,9 @@ export default function EditorStudio() {
       apiRequest("POST", `/api/editor/issues/${issueId}/publish`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/editor/issues"] });
+    },
+    onSettled: () => {
+      setPublishingIssueId(null);
     },
   });
 
@@ -306,11 +316,14 @@ export default function EditorStudio() {
                         </div>
                         {!w.isPublished ? (
                           <button
-                            onClick={() => publishWritingMutation.mutate(w.id)}
-                            disabled={publishWritingMutation.isPending && publishWritingMutation.variables === w.id}
+                            onClick={() => {
+                              setPublishingWritingId(w.id);
+                              publishWritingMutation.mutate(w.id);
+                            }}
+                            disabled={publishingWritingId === w.id}
                             className="shrink-0 flex items-center gap-1.5 px-4 py-2 bg-black text-white rounded-xl font-mono text-[9px] uppercase tracking-widest hover:bg-black/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                           >
-                            {publishWritingMutation.isPending && publishWritingMutation.variables === w.id ? (
+                            {publishingWritingId === w.id ? (
                               <Loader2 size={12} className="animate-spin" />
                             ) : null}
                             Publish
@@ -558,11 +571,14 @@ export default function EditorStudio() {
                         <div className="shrink-0 flex items-center gap-2">
                           {issue.status === "draft" ? (
                             <button
-                              onClick={() => publishIssueMutation.mutate(issue.id)}
-                              disabled={publishIssueMutation.isPending && publishIssueMutation.variables === issue.id}
+                              onClick={() => {
+                                setPublishingIssueId(issue.id);
+                                publishIssueMutation.mutate(issue.id);
+                              }}
+                              disabled={publishingIssueId === issue.id}
                               className="flex items-center gap-1.5 px-4 py-2 bg-black text-white rounded-xl font-mono text-[9px] uppercase tracking-widest hover:bg-black/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
-                              {publishIssueMutation.isPending && publishIssueMutation.variables === issue.id ? (
+                              {publishingIssueId === issue.id ? (
                                 <Loader2 size={12} className="animate-spin" />
                               ) : null}
                               Publish
