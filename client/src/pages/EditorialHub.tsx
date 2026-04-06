@@ -206,7 +206,14 @@ function wordCount(charCount: number) {
 }
 
 function stripHtml(html: string) {
-  return html.replace(/<[^>]*>/g, "").slice(0, 400);
+  // Repeatedly strip tags until no more are present (satisfies static analysis)
+  let text = html;
+  let prev = "";
+  while (prev !== text) {
+    prev = text;
+    text = text.replace(/<[^>]+>/g, " ");
+  }
+  return text.replace(/\s+/g, " ").trim().slice(0, 400);
 }
 
 const DECISION_COLORS: Record<string, string> = {
