@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, BookOpen, Bookmark, Heart, Plus, Trash2, Check, ChevronDown, Sparkles, Eye } from "lucide-react";
+import { Search, BookOpen, Bookmark, Heart, Plus, Trash2, Check, ChevronDown, Sparkles, Eye, Flame, Star, Mic2, Tag } from "lucide-react";
 import { timeAgo, apiFetch, GlassCard, PageHeader, ActionButton, LoadingSkeleton, EmptyState, TabGroup, FormField, inputClass, textareaClass, Badge } from "./GardenUI";
 import { stripHtml } from "./RichEditor";
 
@@ -777,6 +777,291 @@ export function PollinationPage() {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+// ─── Discover Page ───────────────────────────────────────────────────────────
+
+type DiscoverWriting = {
+  id: string;
+  title: string;
+  content: string;
+  genre: string;
+  authorId: string;
+  authorName: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+  tags: string[] | null;
+  resonanceCount?: number;
+  readCount?: number;
+};
+
+const discoverGenres = ["all", "poetry", "fiction", "essay", "fragment", "hybrid", "other"] as const;
+
+function DiscoverCard({
+  writing,
+  index,
+  onViewProfile,
+}: {
+  writing: DiscoverWriting;
+  index: number;
+  onViewProfile?: (userId: string) => void;
+}) {
+  const colors = getGenreColors(writing.genre);
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.04, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ scale: 1.03, y: -5 }}
+      className="flex-shrink-0 w-60 relative rounded-2xl border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm overflow-hidden cursor-default transition-all group"
+      style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)" }}
+      data-testid={`discover-card-${writing.id}`}
+    >
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{ background: `radial-gradient(ellipse at 50% 0%, ${colors.glow} 0%, transparent 70%)` }}
+      />
+      <div
+        className="absolute top-0 left-0 right-0 h-[2px]"
+        style={{ background: `linear-gradient(90deg, transparent, ${colors.glow.replace("0.06", "0.4")}, transparent)` }}
+      />
+      <div className="relative z-10 p-5">
+        <h3 className="text-base font-display font-light italic text-white/70 truncate mb-1.5">
+          {writing.title || "Untitled"}
+        </h3>
+        {writing.authorName && (
+          <button
+            onClick={() => onViewProfile?.(writing.authorId)}
+            className="font-serif text-xs text-white/35 hover:text-white/60 transition-colors mb-2 truncate block w-full text-left"
+            data-testid={`discover-author-${writing.id}`}
+          >
+            {writing.authorName}
+          </button>
+        )}
+        <p className="text-xs font-serif text-white/25 line-clamp-3 mb-3 leading-relaxed">
+          {stripHtml(writing.content || "").slice(0, 120)}
+        </p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Badge color={colors.accent}>{writing.genre}</Badge>
+          {writing.tags && writing.tags.slice(0, 2).map((tag) => (
+            <span key={tag} className="font-mono text-[8px] text-white/20 border border-white/[0.06] rounded px-1.5 py-0.5">
+              {tag}
+            </span>
+          ))}
+        </div>
+        <span className="mt-2 block font-mono text-[8px] text-white/15">
+          {timeAgo(writing.publishedAt || writing.createdAt)}
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
+function DiscoverShelf({
+  label,
+  icon,
+  writings,
+  isLoading,
+  onViewProfile,
+  testId,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  writings: DiscoverWriting[];
+  isLoading: boolean;
+  onViewProfile?: (userId: string) => void;
+  testId: string;
+}) {
+  if (isLoading) {
+    return (
+      <div className="mb-10" data-testid={`${testId}-skeleton`}>
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-white/20">{icon}</span>
+          <span className="font-mono text-[9px] uppercase tracking-widest text-white/20">{label}</span>
+        </div>
+        <div className="flex gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex-shrink-0 w-60 h-36 rounded-2xl bg-white/[0.03] animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (writings.length === 0) return null;
+
+  return (
+    <div className="mb-10" data-testid={testId}>
+      <div className="flex items-center gap-2 mb-4">
+        <span className="text-white/30">{icon}</span>
+        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/30">{label}</span>
+        <div className="flex-grow h-px bg-white/[0.04]" />
+        <span className="font-mono text-[8px] text-white/15">{writings.length} pieces</span>
+      </div>
+      <div className="flex gap-4 overflow-x-auto pb-3" style={{ scrollbarWidth: "none" }}>
+        {writings.map((w, i) => (
+          <DiscoverCard key={w.id} writing={w} index={i} onViewProfile={onViewProfile} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function DiscoverPage({ onViewProfile }: { onViewProfile?: (userId: string) => void }) {
+  const [search, setSearch] = useState("");
+  const [genreFilter, setGenreFilter] = useState<string>("all");
+
+  const { data: featured = [], isLoading: loadingFeatured } = useQuery<DiscoverWriting[]>({
+    queryKey: ["/api/gallery/featured"],
+    queryFn: () => apiFetch("/api/gallery/featured"),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: newVoices = [], isLoading: loadingNewVoices } = useQuery<DiscoverWriting[]>({
+    queryKey: ["/api/gallery/new-voices"],
+    queryFn: () => apiFetch("/api/gallery/new-voices"),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: trending = [], isLoading: loadingTrending } = useQuery<DiscoverWriting[]>({
+    queryKey: ["/api/gallery/trending"],
+    queryFn: () => apiFetch("/api/gallery/trending"),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  function filterWritings(list: DiscoverWriting[]) {
+    let result = list;
+    if (genreFilter !== "all") {
+      result = result.filter((w) => w.genre === genreFilter);
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (w) =>
+          (w.title || "").toLowerCase().includes(q) ||
+          (w.authorName || "").toLowerCase().includes(q) ||
+          (w.content || "").toLowerCase().includes(q) ||
+          (w.tags || []).some((t) => t.toLowerCase().includes(q)),
+      );
+    }
+    return result;
+  }
+
+  const filteredFeatured = filterWritings(featured);
+  const filteredNewVoices = filterWritings(newVoices);
+  const filteredTrending = filterWritings(trending);
+
+  const isLoading = loadingFeatured || loadingNewVoices || loadingTrending;
+  const isEmpty =
+    !isLoading &&
+    filteredFeatured.length === 0 &&
+    filteredNewVoices.length === 0 &&
+    filteredTrending.length === 0;
+
+  return (
+    <div className="max-w-5xl mx-auto" data-testid="discover-page">
+      {/* Search + genre filters */}
+      <div className="mb-8 space-y-3">
+        <div className="relative">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by title, author, or keyword..."
+            className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] py-3 pl-9 pr-4 text-sm text-white/80 placeholder:text-white/30 outline-none transition-all focus:border-white/[0.16]"
+            data-testid="input-discover-search"
+          />
+        </div>
+        <div className="flex gap-1.5 flex-wrap" data-testid="discover-genre-filters">
+          {discoverGenres.map((g) => {
+            const colors = getGenreColors(g);
+            const isActive = genreFilter === g;
+            return (
+              <button
+                key={g}
+                onClick={() => setGenreFilter(g)}
+                className={`px-3 py-1.5 rounded-full font-mono text-[9px] uppercase tracking-widest transition-all border ${
+                  isActive
+                    ? `${colors.text} ${colors.bg} ${colors.border}`
+                    : "border-transparent text-white/35 hover:text-white/60"
+                }`}
+                data-testid={`discover-filter-${g}`}
+              >
+                {g}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {isEmpty && (
+        <div className="border border-dashed border-white/[0.06] rounded-2xl p-16 text-center space-y-3">
+          <Sparkles size={28} className="mx-auto text-white/15" />
+          <p className="font-serif text-sm text-white/30 italic">
+            {search || genreFilter !== "all"
+              ? "No pieces match this search. Try different keywords or clear the filters."
+              : "No published pieces in the gallery yet. Check back soon."}
+          </p>
+        </div>
+      )}
+
+      <DiscoverShelf
+        label="Featured"
+        icon={<Star size={12} />}
+        writings={filteredFeatured}
+        isLoading={loadingFeatured}
+        onViewProfile={onViewProfile}
+        testId="discover-featured"
+      />
+
+      <DiscoverShelf
+        label="New Voices"
+        icon={<Mic2 size={12} />}
+        writings={filteredNewVoices}
+        isLoading={loadingNewVoices}
+        onViewProfile={onViewProfile}
+        testId="discover-new-voices"
+      />
+
+      <DiscoverShelf
+        label="Trending"
+        icon={<Flame size={12} />}
+        writings={filteredTrending}
+        isLoading={loadingTrending}
+        onViewProfile={onViewProfile}
+        testId="discover-trending"
+      />
+
+      {/* Tag-based browsing — unique tags across all pieces */}
+      {!isLoading && (() => {
+        const allTags = Array.from(
+          new Set([...featured, ...newVoices, ...trending].flatMap((w) => w.tags || []))
+        ).slice(0, 20);
+        if (allTags.length === 0) return null;
+        return (
+          <div className="mt-4" data-testid="discover-tags">
+            <div className="flex items-center gap-2 mb-3">
+              <Tag size={11} className="text-white/25" />
+              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/25">Browse by tag</span>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {allTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setSearch(tag)}
+                  className="font-mono text-[9px] text-white/30 border border-white/[0.06] hover:border-white/[0.15] hover:text-white/60 rounded-lg px-2.5 py-1 transition-all"
+                  data-testid={`discover-tag-${tag}`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

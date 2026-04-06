@@ -37,6 +37,7 @@ import { BloomCelebration } from "@/components/garden/BloomCelebration";
 import { SeedIcon, SproutIcon, BloomIcon, stageIcons } from "@/components/garden/GardenIcons";
 import { Skeleton, DeskSkeleton, ReadingRoomSkeleton, CommunityRoomSkeleton } from "@/components/garden/GardenSkeletons";
 import { stageColors, stageAccent, stageGlow, stageCardBg, stageCardBorder, genreOptions, wordCount, timeAgo, Zone, ActiveRoom, GreenhouseTool } from "@/components/garden/GardenUtils";
+import { DiscoverPage } from "@/components/garden/DiscoverFeatures";
 
 const rooms = [
   { id: "tables", label: "Tables", icon: <Users size={13} />, desc: "Community discussions", comingSoon: false },
@@ -1874,6 +1875,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
   const [page, setPage] = useState(1);
   const [activeSort, setActiveSort] = useState<ReadingRoomSort>("recent");     const [readingRoomSearch, setReadingRoomSearch] = useState("");
   const [genreFilter, setGenreFilter] = useState("all");
+  const [readingRoomView, setReadingRoomView] = useState<"feed" | "discover">("feed");
   const perPage = 8;
 
   const { data: dailyLetter, isLoading: loadingDailyLetter } = useQuery<DailyLetterPiece | null>({
@@ -1958,8 +1960,37 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
         <div className="mt-3">
           <WhosHereStrip />
         </div>
+        <div className="mt-4 flex gap-1">
+          <button
+            onClick={() => setReadingRoomView("feed")}
+            className={`px-4 py-1.5 rounded-full font-mono text-[9px] uppercase tracking-widest transition-all border ${
+              readingRoomView === "feed"
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300/90"
+                : "border-white/[0.06] text-white/40 hover:text-white/60 hover:border-white/[0.12]"
+            }`}
+            data-testid="tab-reading-room-feed"
+          >
+            Feed
+          </button>
+          <button
+            onClick={() => setReadingRoomView("discover")}
+            className={`px-4 py-1.5 rounded-full font-mono text-[9px] uppercase tracking-widest transition-all border ${
+              readingRoomView === "discover"
+                ? "border-amber-500/30 bg-amber-500/10 text-amber-300/90"
+                : "border-white/[0.06] text-white/40 hover:text-white/60 hover:border-white/[0.12]"
+            }`}
+            data-testid="tab-reading-room-discover"
+          >
+            Discover
+          </button>
+        </div>
       </div>
 
+      {readingRoomView === "discover" && (
+        <DiscoverPage onViewProfile={onViewProfile} />
+      )}
+
+      {readingRoomView === "feed" && <>
               <DailyNudge
         onGoToCafe={() => onGoToRoom?.("tables")}
         onGoToWorkshop={() => onGoToRoom?.("workshop")}
@@ -2217,6 +2248,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
           </button>
         </div>
       )}
+      </>}
     </div>
   );
 }
