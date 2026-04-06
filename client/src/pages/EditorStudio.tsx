@@ -26,6 +26,7 @@ const READINESS_STYLE: Record<string, string> = {
   growing: "bg-blue-50 text-blue-600",
   dormant: "bg-gray-50 text-gray-500",
   raw_seed: "bg-amber-50 text-amber-600",
+  default: "bg-gray-50 text-gray-500",
 };
 
 const STATUS_STYLE: Record<string, string> = {
@@ -288,7 +289,7 @@ export default function EditorStudio() {
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-medium text-sm truncate">{writing.title || "Untitled"}</h3>
                             {writing.readiness && (
-                              <span className={`shrink-0 text-[8px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full ${READINESS_STYLE[writing.readiness] ?? "bg-gray-50 text-gray-500"}`}>
+                              <span className={`shrink-0 text-[8px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full ${READINESS_STYLE[writing.readiness] ?? READINESS_STYLE.default}`}>
                                 {READINESS_LABEL[writing.readiness] ?? writing.readiness}
                               </span>
                             )}
@@ -392,6 +393,8 @@ export default function EditorStudio() {
                         toast({ title: "Add pieces to the Greenhouse first.", variant: "destructive" });
                         return;
                       }
+                      // Sends a request for the most recently added greenhouse piece.
+                      // A future improvement could let the editor select which piece to contact about.
                       const writing = writingsById.get(entry.writingId);
                       if (writing) createRequestMutation.mutate({ writingId: writing.id, authorId: writing.authorId });
                     }}
@@ -573,8 +576,8 @@ export default function EditorStudio() {
                   onClick={() =>
                     createIssueMutation.mutate({
                       title: newIssueTitle,
-                      subtitle: newIssueSubtitle || undefined,
-                      themeNote: newIssueTheme || undefined,
+                      subtitle: newIssueSubtitle.trim() || undefined,
+                      themeNote: newIssueTheme.trim() || undefined,
                     })
                   }
                   className="flex-1 bg-black text-white rounded-xl py-3 text-sm font-mono uppercase tracking-widest hover:bg-black/80 disabled:opacity-50"
