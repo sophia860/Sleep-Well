@@ -896,7 +896,7 @@ function DiscoverShelf({
     <div className="mb-10" data-testid={testId}>
       <div className="flex items-center gap-2 mb-4">
         <span className="text-white/30">{icon}</span>
-        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/30">{label}</span>
+        <span className="font-mono text-[9px] uppercase tracking-widest text-white/30">{label}</span>
         <div className="flex-grow h-px bg-white/[0.04]" />
         <span className="font-mono text-[8px] text-white/15">{writings.length} pieces</span>
       </div>
@@ -1045,7 +1045,7 @@ export function DiscoverPage({ onViewProfile }: { onViewProfile?: (userId: strin
           <div className="mt-4" data-testid="discover-tags">
             <div className="flex items-center gap-2 mb-3">
               <Tag size={11} className="text-white/25" />
-              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/25">Browse by tag</span>
+              <span className="font-mono text-[9px] uppercase tracking-widest text-white/25">Browse by tag</span>
             </div>
             <div className="flex gap-2 flex-wrap">
               {allTags.map((tag) => (
