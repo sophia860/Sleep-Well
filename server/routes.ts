@@ -1,3 +1,4 @@
+import { registerEditorialDashboardRoutes } from "./routes/editorialDashboard";
 import { registerAuthorEditorConversationRoutes } from "./routes/authorEditorConversations";
 import { registerCopyAgentRoutes } from "./routes/copyAgent";
 import { registerEditorialBriefRoutes } from "./routes/editorialBriefs";
@@ -8547,6 +8548,7 @@ const sharedPieces = await db.select({
   });
 
   registerEditorialRoomRoutes(app);
+  registerEditorialDashboardRoutes(app);
     registerServiceInquiryRoutes(app);   registerGalleryFeedbackRoutes(app);   registerGalleryFeedbackRoutes(app);
     registerEditorialOrderRoutes(app);
     registerWritingLayoutRoutes(app);
