@@ -1091,6 +1091,18 @@ export interface IStorage {
     }[]
   >;
 
+  getPublicEditors(): Promise<
+    {
+      id: string;
+      displayName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+      bio: string | null;
+      profileImageUrl: string | null;
+      role: string | null;
+    }[]
+  >;
+
   // All Greenhouse
   getAllGreenhouseEntries(): Promise<
     (GreenhouseEntry & {
@@ -5716,6 +5728,31 @@ export class DatabaseStorage implements IStorage {
         firstName: users.firstName,
         lastName: users.lastName,
         email: users.email,
+        role: users.role,
+      })
+      .from(users)
+      .where(or(eq(users.role, "editor"), eq(users.role, "editor_in_chief")));
+  }
+
+  async getPublicEditors(): Promise<
+    {
+      id: string;
+      displayName: string | null;
+      firstName: string | null;
+      lastName: string | null;
+      bio: string | null;
+      profileImageUrl: string | null;
+      role: string | null;
+    }[]
+  > {
+    return await db
+      .select({
+        id: users.id,
+        displayName: users.displayName,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        bio: users.bio,
+        profileImageUrl: users.profileImageUrl,
         role: users.role,
       })
       .from(users)

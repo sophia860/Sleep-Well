@@ -7811,6 +7811,17 @@ const sharedPieces = await db.select({
     }
   });
 
+  // Public editors listing
+  app.get("/api/public/editors", async (req, res) => {
+    try {
+      const editors = await storage.getPublicEditors();
+      res.json(editors);
+    } catch (error) {
+      console.error("Error fetching public editors:", error);
+      res.status(500).json({ message: "Failed to fetch editors" });
+    }
+  });
+
     // ============================================================
   // THE GROVE — Botanical Social Layer
   // ============================================================

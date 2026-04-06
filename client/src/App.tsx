@@ -44,6 +44,7 @@ const FieldGuide = lazy(() => import("@/pages/FieldGuide"));
 const EditProfile = lazy(() => import("@/pages/EditProfile"));
 const GardenGuide = lazy(() => import("@/pages/GardenGuide"));
 const ContactEditors = lazy(() => import("@/pages/ContactEditors"));
+const Editors = lazy(() => import("@/pages/Editors"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const Publications = lazy(() => import("@/pages/Publications"));
 const Opportunities = lazy(() => import("@/pages/Opportunities"));
@@ -59,7 +60,6 @@ const EditorialPayment = lazy(() => import("@/pages/EditorialPayment"));
 const EditorialRoom = lazy(() => import("@/pages/EditorialRoom"));
 const Marketplace = lazy(() => import("@/pages/Marketplace"));
 const Challenges = lazy(() => import("@/pages/Challenges"));
-const Publications = lazy(() => import("@/pages/Publications"));
 const Exhibits = lazy(() => import("@/pages/Exhibits"));
 const Exhibit = lazy(() => import("@/pages/Exhibit"));
 const WorkshopRoom = lazy(() => import("@/pages/WorkshopRoom"));
@@ -99,6 +99,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/gallery": "The Journal — The Page Gallery",
   "/journal": "The Journal — The Page Gallery",
   "/about": "About — The Page Gallery Journal",
+  "/editors": "Our Editors — The Page Gallery Journal",
   "/garden": "My Garden — The Page Gallery",
   "/commons": "The Commons — The Page Gallery",
   "/how-it-works": "How It Works — The Page Gallery",
@@ -160,6 +161,7 @@ function Router() {
         <Route path="/edit-profile">{() => <ProtectedRoute component={EditProfile} path="/edit-profile" />}</Route>
         <Route path="/garden-guide" component={GardenGuide} />
         <Route path="/contact-editors" component={ContactEditors} />
+        <Route path="/editors" component={Editors} />
         <Route path="/opportunities" component={Opportunities} />
         <Route path="/submissions" component={Submissions} />
         <Route path="/for-journals" component={ForJournals} />
@@ -175,13 +177,11 @@ function Router() {
         <Route path="/editorial-room">{() => <EditorProtectedRoute component={EditorialRoom} path="/editorial-room" />}</Route>
         <Route path="/marketplace" component={Marketplace} />
         <Route path="/challenges" component={Challenges} />
-        <Route path="/publications" component={Publications} />
         <Route path="/exhibits" component={Exhibits} />
         <Route path="/exhibits/:slug" component={Exhibit} />
         <Route path="/workshop-room">{() => <ProtectedRoute component={WorkshopRoom} path="/workshop-room" />}</Route>
         <Route path="/cultivator" component={Cultivator} />
         <Route path="/grove">{() => <ProtectedRoute component={Grove} path="/grove" />}</Route>
-                  <Route path="/atelier" component={Atelier} />
         <Route path="/atelier" component={Atelier} />
         <Route component={NotFound} />
       </Switch>
