@@ -14,6 +14,7 @@ export function registerGalleryDiscoverRoutes(app: Express) {
           content: writings.content,
           genre: writings.genre,
           authorId: writings.authorId,
+          authorName: sql<string>`TRIM(CONCAT(${users.firstName}, ' ', COALESCE(${users.lastName}, '')))`.as("author_name"),
           publishedAt: writings.publishedAt,
           createdAt: writings.createdAt,
           layout: writings.layout,
@@ -21,6 +22,7 @@ export function registerGalleryDiscoverRoutes(app: Express) {
           resonanceCount: sql<number>`(SELECT COUNT(*) FROM resonances WHERE writing_id = ${writings.id})`.as("resonance_count"),
         })
         .from(writings)
+        .leftJoin(users, eq(writings.authorId, users.id))
         .where(
           and(
             eq(writings.galleryOptIn, true),
@@ -46,12 +48,14 @@ export function registerGalleryDiscoverRoutes(app: Express) {
           content: writings.content,
           genre: writings.genre,
           authorId: writings.authorId,
+          authorName: sql<string>`TRIM(CONCAT(${users.firstName}, ' ', COALESCE(${users.lastName}, '')))`.as("author_name"),
           publishedAt: writings.publishedAt,
           createdAt: writings.createdAt,
           layout: writings.layout,
           tags: writings.tags,
         })
         .from(writings)
+        .leftJoin(users, eq(writings.authorId, users.id))
         .where(
           and(
             eq(writings.galleryOptIn, true),
@@ -77,6 +81,7 @@ export function registerGalleryDiscoverRoutes(app: Express) {
           content: writings.content,
           genre: writings.genre,
           authorId: writings.authorId,
+          authorName: sql<string>`TRIM(CONCAT(${users.firstName}, ' ', COALESCE(${users.lastName}, '')))`.as("author_name"),
           publishedAt: writings.publishedAt,
           createdAt: writings.createdAt,
           layout: writings.layout,
@@ -84,6 +89,7 @@ export function registerGalleryDiscoverRoutes(app: Express) {
           readCount: sql<number>`(SELECT COUNT(*) FROM quiet_reads WHERE writing_id = ${writings.id} AND created_at > NOW() - INTERVAL '30 days')`.as("read_count"),
         })
         .from(writings)
+        .leftJoin(users, eq(writings.authorId, users.id))
         .where(
           and(
             eq(writings.galleryOptIn, true),
