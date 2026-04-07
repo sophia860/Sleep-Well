@@ -66,38 +66,27 @@ export default function Featured() {
       <div ref={sectionRef} className="max-w-4xl mx-auto w-full px-6 space-y-16 relative z-10">
         {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 40, filter: "blur(6px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           viewport={{ once: true }}
-          className="text-center space-y-6"
+          className="space-y-5"
         >
-          <motion.span
-            className="font-sans text-[length:var(--text-label)] tracking-[0.06em] text-amber-200 block uppercase"
-            initial={{ opacity: 0, letterSpacing: "0.2em" }}
-            whileInView={{ opacity: 1, letterSpacing: "0.4em" }}
-            transition={{ duration: 1.2 }}
-            viewport={{ once: true }}
-          >
-            Latest
-          </motion.span>
-          <h2 className="text-5xl md:text-6xl font-display font-light tracking-normal">
+          <div className="flex items-center gap-4">
+            <div className="h-px w-8" style={{ background: "rgba(212,168,83,0.4)" }} />
+            <span className="section-eyebrow">Latest from the Journal</span>
+          </div>
+          <h2 className="font-display text-[clamp(2.5rem,5vw,3.75rem)] font-light tracking-tight" style={{ color: "#f0ede8" }}>
             From the Journal
           </h2>
-          <p className="font-sans text-[length:var(--text-small)] text-white/70 tracking-wide mt-2">
+          <p className="font-sans text-sm leading-relaxed max-w-md" style={{ color: "rgba(240,237,232,0.5)" }}>
             Published stories and poems, selected by our editors
           </p>
-          <motion.div
-            className="flex items-center justify-center gap-4 pt-2"
-            initial={{ opacity: 0, scaleX: 0 }}
-            whileInView={{ opacity: 1, scaleX: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-amber-600/40" />
-            <div className="w-1.5 h-1.5 rotate-45 border border-amber-600/40" />
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-amber-600/40" />
-          </motion.div>
+          <div className="flex items-center gap-3 pt-2">
+            <div className="h-px w-12" style={{ background: "rgba(212,168,83,0.2)" }} />
+            <div className="w-1 h-1 rotate-45" style={{ background: "rgba(212,168,83,0.4)" }} />
+            <div className="h-px w-12" style={{ background: "rgba(212,168,83,0.2)" }} />
+          </div>
         </motion.div>
 
         {/* Piece cards */}
@@ -123,7 +112,7 @@ export default function Featured() {
                 viewport={{ once: true }}
               >
                 <Link href={`/piece/${piece.id}`}>
-                  <div className="group border-t border-white/8 py-7 px-2 flex flex-col md:flex-row md:items-start gap-4 cursor-pointer hover:bg-white/[0.02] transition-colors">
+                  <div className="group border-t border-[#f0ede8]/[0.06] py-8 px-2 flex flex-col md:flex-row md:items-start gap-4 cursor-pointer hover:bg-[#d4a853]/[0.02] transition-all duration-500">
                     {/* Genre + index */}
                     <div className="flex-shrink-0 w-28">
                       <span className="font-sans text-[length:var(--text-label)] tracking-[0.06em] text-amber-300/60 uppercase">
@@ -154,7 +143,7 @@ export default function Featured() {
                 </Link>
               </motion.div>
             ))}
-            <div className="border-t border-white/8" />
+            <div className="border-t border-[#f0ede8]/[0.06]" />
           </div>
         )}
 
@@ -167,7 +156,10 @@ export default function Featured() {
           className="flex justify-center pt-4"
         >
           <Link href="/in-bloom">
-            <button className="flex items-center gap-2 font-sans text-[length:var(--text-label)] tracking-[0.3em] text-amber-200/70 hover:text-amber-200 transition-colors uppercase border border-amber-600/20 hover:border-amber-600/50 px-6 py-3 rounded-sm">
+            <button
+              className="flex items-center gap-2 font-mono text-[0.6875rem] tracking-[0.25em] uppercase transition-all duration-300 border px-7 py-3 rounded-full hover:border-[#d4a853]/50 hover:text-[#f0ede8]/80"
+              style={{ borderColor: "rgba(212,168,83,0.25)", color: "rgba(240,237,232,0.5)" }}
+            >
               Read Published Work
               <ArrowRight className="w-3 h-3" />
             </button>
