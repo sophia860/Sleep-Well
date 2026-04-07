@@ -3169,6 +3169,33 @@ app.get("/api/garden/last-draft", isAuthenticated, async (req: any, res) => {
     },
   );
 
+  // Editor-only route to update a writing's readiness without requiring authorship
+  app.patch(
+    "/api/editor/writings/:id/readiness",
+    isAuthenticated,
+    isEditor,
+    async (req: any, res) => {
+      try {
+        const { readiness } = req.body;
+        const validValues = ["raw_seed", "growing", "ready_to_show", "dormant"];
+        if (!readiness || !validValues.includes(readiness)) {
+          return res.status(400).json({ message: "Invalid readiness value" });
+        }
+        const writing = await storage.getWriting(req.params.id);
+        if (!writing) return res.status(404).json({ message: "Writing not found" });
+        const [updated] = await db
+          .update(writings)
+          .set({ readiness, updatedAt: new Date() })
+          .where(eq(writings.id, req.params.id))
+          .returning();
+        res.json(updated);
+      } catch (error) {
+        console.error("Failed to update writing readiness:", error);
+        res.status(500).json({ message: "Failed to update readiness" });
+      }
+    },
+  );
+
   // === CURATED OPPORTUNITIES ===
   app.get("/api/curated-opportunities", async (req, res) => {
     try {
