@@ -1,7 +1,8 @@
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
-import { Link } from "wouter";
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-init";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { useLocation } from "wouter";
+import { gsap, prefersReducedMotion } from "@/lib/gsap-init";
+import { useAuth } from "@/hooks/use-auth";
 
 function SeedDoodle() {
   return (
@@ -168,7 +169,38 @@ function StageRow({ item, index }: { item: typeof stages[0]; index: number }) {
   );
 }
 
+type GardenNavStatus = "idle" | "loading" | "auth-required" | "error";
+
 export default function GardenIntro() {
+  const { isLoading: authLoading } = useAuth();
+  const [, navigate] = useLocation();
+  const [navStatus, setNavStatus] = useState<GardenNavStatus>("idle");
+
+  const openGarden = useCallback(async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (navStatus === "loading") return;
+    setNavStatus("loading");
+    try {
+      const res = await fetch("/api/auth/user", { credentials: "include" });
+      if (res.status === 401) {
+        setNavStatus("auth-required");
+        navigate("/sign-in?next=/garden");
+        return;
+      }
+      if (!res.ok) throw new Error("Session check failed");
+      setNavStatus("idle");
+      navigate("/garden");
+    } catch {
+      setNavStatus("error");
+    }
+  }, [navStatus, navigate]);
+
+  const statusMessage =
+    navStatus === "loading" ? "Opening your Garden\u2026" :
+    navStatus === "auth-required" ? "Please sign in to open your Garden." :
+    navStatus === "error" ? "We could not open your Garden. Please try again." :
+    null;
+
   return (
     <section className="relative py-32 md:py-48 px-6 md:px-12 overflow-hidden">
       <div className="max-w-4xl mx-auto">
@@ -217,15 +249,29 @@ export default function GardenIntro() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 1 }}
           viewport={{ once: true }}
-          className="text-center mt-24"
+          className="text-center mt-24 space-y-3"
         >
-          <Link
-            href="/garden"
-            className="inline-block font-display italic text-lg text-white/40 hover:text-white/80 transition-colors duration-700 border-b border-white/10 hover:border-white/30 pb-1"
+          <button
+            onClick={openGarden}
+            disabled={navStatus === "loading" || authLoading}
+            className="inline-block font-display italic text-lg text-white/40 hover:text-white/80 transition-colors duration-700 border-b border-white/10 hover:border-white/30 pb-1 disabled:cursor-wait disabled:opacity-60"
             data-testid="link-enter-garden"
+            aria-busy={navStatus === "loading"}
           >
-            Begin writing &rarr;
-          </Link>
+            {navStatus === "loading" ? "Opening\u2026" : "Open the Garden editor"} &rarr;
+          </button>
+          <p className="font-sans text-xs text-white/25">
+            The editor opens in your Garden workspace.
+          </p>
+          {statusMessage && navStatus !== "loading" && (
+            <p
+              data-garden-status
+              role="status"
+              className={`font-sans text-sm mt-2 ${navStatus === "error" ? "text-red-400/70" : "text-white/50"}`}
+            >
+              {statusMessage}
+            </p>
+          )}
         </motion.div>
       </div>
     </section>
