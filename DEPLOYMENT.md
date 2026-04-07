@@ -42,3 +42,11 @@ Key vars to set in Render:
 - `nixpacks.toml` is **not** a Railway config — it is used by Render's Nixpacks builder for node version and build phase control.
 - Do **not** use Replit for production. The `.replit` file in this repo is legacy and unused.
 - Health check endpoint: `GET /health` (used for Render keep-warm pings).
+
+## Common Build Gotchas
+
+### Duplicate `const` declarations in `App.tsx`
+
+Every `lazy(() => import(...))` declaration in `client/src/App.tsx` must be unique. A duplicate `const Publications` (or any other component name) will cause a **JavaScript syntax error** and the Vite build will fail silently on Render — the site will stop updating entirely.
+
+**How to avoid:** Before merging a PR that adds new lazy imports to `App.tsx`, search the file for the same variable name. If it already exists, remove the duplicate instead of adding a second declaration. Likewise, each `<Route path="...">` should appear only once in the `Router` function.
