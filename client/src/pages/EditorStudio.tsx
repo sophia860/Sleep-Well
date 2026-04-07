@@ -253,7 +253,8 @@ export default function EditorStudio() {
   function handleSelectWriting(id: string) {
     setSelectedWritingId(prev => prev === id ? null : id);
     setSelectedIssueId(null);
-    setActiveTab("pipeline");
+    // Only navigate to pipeline tab if we're not already there
+    if (activeTab !== "pipeline") setActiveTab("pipeline");
   }
 
   function handleSelectIssue(id: string) {
@@ -334,7 +335,7 @@ export default function EditorStudio() {
                   {BUCKET_FILTERS.map(f => (
                     <button
                       key={f.id}
-                      onClick={() => { setBucket(f.id); setSelectedWritingId(null); }}
+                      onClick={() => { if (bucket !== f.id) { setBucket(f.id); setSelectedWritingId(null); } }}
                       className={`px-3 py-1.5 rounded-full font-mono text-[9px] uppercase tracking-widest border transition-all ${bucket === f.id ? "bg-black text-white border-black" : "border-black/10 text-black/40 hover:border-black/30"}`}
                     >
                       {f.label}
@@ -582,11 +583,9 @@ export default function EditorStudio() {
               {/* Create Publish Request */}
               <button
                 onClick={() => {
-                  if (selectedWriting.authorId) {
-                    createRequestMutation.mutate({ writingId: selectedWriting.id, authorId: selectedWriting.authorId });
-                  }
+                  createRequestMutation.mutate({ writingId: selectedWriting.id, authorId: selectedWriting.authorId });
                 }}
-                disabled={createRequestMutation.isPending || selectedWriting.isPublished}
+                disabled={createRequestMutation.isPending || selectedWriting.isPublished || !selectedWriting.authorId}
                 className="w-full rounded-xl py-2.5 font-mono text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all bg-[#f9f8f4] border border-black/10 text-black/60 hover:bg-black/5 disabled:opacity-40"
               >
                 <Send size={13} />
@@ -690,7 +689,7 @@ export default function EditorStudio() {
                     <span className="text-[9px] font-mono uppercase">New Issue</span>
                   </button>
                   <button
-                    onClick={() => { setBucket("ready"); setActiveTab("pipeline"); }}
+                    onClick={() => { setBucket("ready"); setActiveTab("pipeline"); setSelectedWritingId(null); }}
                     className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all"
                   >
                     <Clock size={20} />
