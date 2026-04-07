@@ -119,7 +119,7 @@ export default function EditorStudio() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#f7f4ee] flex items-center justify-center">
+      <main className="relative z-[60] min-h-screen bg-[#f7f4ee] flex items-center justify-center">
         <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-black/40">Loading…</p>
       </main>
     );
@@ -127,7 +127,7 @@ export default function EditorStudio() {
 
   if (!isLoading && (!user || (user.role !== "editor" && user.role !== "editor_in_chief"))) {
     return (
-      <main className="min-h-screen bg-[#f7f4ee] flex items-center justify-center p-6 text-center">
+      <main className="relative z-[60] min-h-screen bg-[#f7f4ee] flex items-center justify-center p-6 text-center">
         <div className="max-w-md space-y-4">
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-black/50">Access Denied</p>
           <h1 className="text-3xl font-semibold">Editor Studio is restricted</h1>
@@ -138,7 +138,7 @@ export default function EditorStudio() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] text-[#1f1d18] flex flex-col">
+    <main className="relative z-[60] min-h-screen bg-[#f7f4ee] text-[#1f1d18] flex flex-col">
       {/* Universal Header */}
       <header className="border-b border-black/5 bg-white px-6 py-4 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
