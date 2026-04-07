@@ -773,7 +773,7 @@ export default function EditorStudio() {
                     {issuePieces.map(piece => (
                       <div key={piece.id} className="flex items-center gap-2 px-3 py-2 bg-[#f9f8f4] rounded-xl">
                         <FileText size={11} className="text-black/30 shrink-0" />
-                        <p className="text-xs text-black/70 truncate">{piece.writingId}</p>
+                        <p className="text-xs text-black/70 truncate">{piece.writingTitle ?? piece.writingId}</p>
                       </div>
                     ))}
                   </div>
@@ -856,7 +856,7 @@ export default function EditorStudio() {
                     { label: "Ready Queue", value: `${writings.filter(w => w.readiness === "ready_to_show").length} Pieces` },
                     { label: "In Greenhouse", value: `${greenhouse.length} Pieces` },
                     { label: "Open Issues", value: `${issues.filter(i => i.status === "draft").length} Draft` },
-                    { label: "Pending Requests", value: `${requests.filter(r => r.status === "draft").length}` },
+                    { label: "Pending Requests", value: `${requests.filter(r => r.status === "draft" || r.status === "pending").length}` },
                   ].map(stat => (
                     <div key={stat.label} className="flex items-center justify-between">
                       <span className="text-xs text-black/60 font-mono">{stat.label}</span>
