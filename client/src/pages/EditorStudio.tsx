@@ -41,12 +41,12 @@ export default function EditorStudio() {
   const [newIssueSubtitle, setNewIssueSubtitle] = useState("");
 
   // Core Data Queries
-  const { data: writings = [], isFetching: isFetchingWritings } = useQuery<WritingWithAuthor[]>({
+  const { data: writings = [], isLoading: isLoadingWritings, isError: isErrorWritings } = useQuery<WritingWithAuthor[]>({
     queryKey: ["/api/editor/garden-stream"],
     enabled: !!user,
   });
 
-  const { data: issues = [] } = useQuery<Issue[]>({
+  const { data: issues = [], isError: isErrorIssues } = useQuery<Issue[]>({
     queryKey: ["/api/editor/issues"],
     enabled: !!user,
   });
@@ -81,6 +81,9 @@ export default function EditorStudio() {
 
   // Selected issue
   const selectedIssue = useMemo(() => issues.find(i => i.id === selectedId) ?? null, [issues, selectedId]);
+
+  // Selected writing (in pipeline view)
+  const selectedPipelineWriting = useMemo(() => writings.find(w => w.id === selectedId) ?? null, [writings, selectedId]);
 
   // Mutations
   const publishIssueMutation = useMutation({
@@ -147,6 +150,7 @@ export default function EditorStudio() {
               { id: "issues", label: "Issues", icon: ClipboardCheck }
             ].map(tab => (
               <button 
+                type="button"
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-mono text-[10px] uppercase tracking-wider transition-all ${activeTab === tab.id ? "bg-white shadow-sm text-black" : "text-black/60 hover:text-black/80"}`}
@@ -161,7 +165,8 @@ export default function EditorStudio() {
 
       <div className="flex-1 max-w-7xl mx-auto w-full p-6 grid lg:grid-cols-[1fr,400px] gap-6">
         <section className="space-y-6">
-          {/* View Search/Filter */}
+          {/* View Search/Filter — only relevant for the pipeline tab */}
+          {activeTab === "pipeline" && (
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
@@ -173,10 +178,11 @@ export default function EditorStudio() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <button className="p-3 bg-white border border-black/5 rounded-2xl hover:bg-black/[0.02]">
+            <button type="button" className="p-3 bg-white border border-black/5 rounded-2xl hover:bg-black/[0.02]">
               <Filter size={18} className="text-black/60" />
             </button>
           </div>
+          )}
 
           {/* Dynamic Content Based on Tab */}
           <div className="bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden min-h-[600px]">
@@ -186,15 +192,17 @@ export default function EditorStudio() {
                   <h2 className="text-2xl font-semibold">Garden Stream</h2>
                   <div className="flex gap-2">
                     {['all', 'triage', 'development', 'ready', 'published'].map(f => (
-                      <button key={f} onClick={() => setBucket(f as any)} className={`px-3 py-1.5 rounded-full font-mono text-[9px] uppercase tracking-widest border ${bucket === f ? "bg-black text-white border-black" : "border-black/10 text-black/40"}`}>
+                      <button type="button" key={f} onClick={() => setBucket(f as any)} className={`px-3 py-1.5 rounded-full font-mono text-[9px] uppercase tracking-widest border ${bucket === f ? "bg-black text-white border-black" : "border-black/10 text-black/40"}`}>
                         {f}
                       </button>
                     ))}
                   </div>
                 </div>
                 <div className="space-y-3">
-                  {isFetchingWritings ? (
+                  {isLoadingWritings ? (
                     <div className="text-center py-20 text-black/30 font-mono text-[10px] uppercase tracking-widest">Scanning Garden for seeds...</div>
+                  ) : isErrorWritings ? (
+                    <div className="text-center py-20 text-red-400 font-mono text-[10px] uppercase tracking-widest">Could not load garden stream. Please refresh.</div>
                   ) : filteredWritings.length === 0 ? (
                     <div className="text-center py-20 text-black/30 font-mono text-[10px] uppercase tracking-widest">No pieces match this filter</div>
                   ) : (
@@ -283,7 +291,9 @@ export default function EditorStudio() {
                   <h2 className="text-2xl font-semibold">Issues</h2>
                   <span className="font-mono text-[10px] uppercase tracking-widest text-black/40">{issues.length} total</span>
                 </div>
-                {issues.length === 0 ? (
+                {isErrorIssues ? (
+                  <div className="text-center py-20 text-red-400 font-mono text-[10px] uppercase tracking-widest">Could not load issues. Please refresh.</div>
+                ) : issues.length === 0 ? (
                   <div className="text-center py-20 text-black/30 font-mono text-[10px] uppercase tracking-widest">No issues created yet</div>
                 ) : (
                   <div className="space-y-3">
@@ -321,7 +331,7 @@ export default function EditorStudio() {
             <div className="bg-white rounded-3xl border border-black/5 p-6 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/40">New Issue</h3>
-                <button onClick={() => setShowNewIssueForm(false)} className="text-black/30 hover:text-black/70 transition-colors">
+                <button type="button" onClick={() => setShowNewIssueForm(false)} className="text-black/30 hover:text-black/70 transition-colors">
                   <X size={14} />
                 </button>
               </div>
@@ -340,6 +350,7 @@ export default function EditorStudio() {
                 className="w-full border border-black/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/10"
               />
               <button
+                type="button"
                 onClick={() => {
                   const payload: { title: string; subtitle?: string } = { title: newIssueTitle.trim() };
                   if (newIssueSubtitle.trim()) payload.subtitle = newIssueSubtitle.trim();
@@ -356,13 +367,14 @@ export default function EditorStudio() {
               <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/70">Quick Actions</h3>
               <div className="grid grid-cols-2 gap-2">
                 <button
+                  type="button"
                   onClick={() => { setShowNewIssueForm(true); setActiveTab("issues"); }}
                   className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all"
                 >
                   <Plus size={20} />
                   <span className="text-[9px] font-mono uppercase">New Issue</span>
                 </button>
-                <button className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all">
+                <button type="button" className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all">
                   <Clock size={20} />
                   <span className="text-[9px] font-mono uppercase">Deadlines</span>
                 </button>
@@ -379,7 +391,7 @@ export default function EditorStudio() {
                   <p className="font-semibold text-sm leading-snug">{selectedIssue.title}</p>
                   {selectedIssue.subtitle && <p className="text-xs text-black/50 mt-0.5">{selectedIssue.subtitle}</p>}
                 </div>
-                <button onClick={() => setSelectedId(null)} className="text-black/30 hover:text-black/70 transition-colors mt-0.5 ml-2 shrink-0">
+                <button type="button" onClick={() => setSelectedId(null)} className="text-black/30 hover:text-black/70 transition-colors mt-0.5 ml-2 shrink-0">
                   <X size={14} />
                 </button>
               </div>
@@ -403,6 +415,7 @@ export default function EditorStudio() {
               </div>
               {selectedIssue.status !== "published" && (
                 <button
+                  type="button"
                   onClick={() => publishIssueMutation.mutate(selectedIssue.id)}
                   disabled={publishIssueMutation.isPending}
                   className="w-full bg-black text-white rounded-xl py-2.5 font-mono text-[10px] uppercase tracking-widest hover:bg-black/80 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
@@ -418,20 +431,68 @@ export default function EditorStudio() {
                 </div>
               )}
             </div>
+          ) : selectedPipelineWriting && activeTab === "pipeline" ? (
+            <div className="bg-white rounded-3xl border border-black/5 p-6 shadow-sm space-y-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/40 mb-1">Selected Piece</h3>
+                  <p className="font-semibold text-sm leading-snug">{selectedPipelineWriting.title}</p>
+                  {selectedPipelineWriting.authorName && (
+                    <p className="text-xs text-black/50 mt-0.5">{selectedPipelineWriting.authorName}</p>
+                  )}
+                </div>
+                <button type="button" onClick={() => setSelectedId(null)} className="text-black/30 hover:text-black/70 transition-colors mt-0.5 ml-2 shrink-0">
+                  <X size={14} />
+                </button>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-black/40 font-mono">Genre</span>
+                  <span className="font-mono uppercase text-[9px] px-2 py-0.5 rounded-full border border-black/10 text-black/50">{selectedPipelineWriting.genre}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-black/40 font-mono">Stage</span>
+                  <span className="font-mono uppercase text-[9px] px-2 py-0.5 rounded-full border border-black/10 text-black/50">{selectedPipelineWriting.readiness.replace(/_/g, " ")}</span>
+                </div>
+                {selectedPipelineWriting.editorialAvailable && (
+                  <div className="flex justify-between">
+                    <span className="text-black/40 font-mono">Editorial</span>
+                    <span className="font-mono text-[9px] px-2 py-0.5 rounded-full bg-green-50 border border-green-200 text-green-700">Open</span>
+                  </div>
+                )}
+                {selectedPipelineWriting.createdAt && (
+                  <div className="flex justify-between">
+                    <span className="text-black/40 font-mono">Added</span>
+                    <span className="font-mono text-[10px]">{format(new Date(selectedPipelineWriting.createdAt), "MMM d, yyyy")}</span>
+                  </div>
+                )}
+              </div>
+              <a
+                href={`/piece/${selectedPipelineWriting.id}`}
+                className="w-full bg-black text-white rounded-xl py-2.5 font-mono text-[10px] uppercase tracking-widest hover:bg-black/80 transition-colors flex items-center justify-center gap-2"
+              >
+                <ExternalLink size={14} />
+                View Piece
+              </a>
+            </div>
           ) : (
             <div className="bg-white rounded-3xl border border-black/5 p-6 shadow-sm">
               <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] text-black/40 mb-6">Active Insights</h3>
               <div className="space-y-4">
-                {[
-                  { label: "Total Seeds", value: `${writings.length}`, color: "#29493d" },
-                  { label: "Ready Queue", value: `${writings.filter(w => w.readiness === "ready_to_show").length} Pieces`, color: "#d97706" },
-                  { label: "Open Issues", value: `${issues.filter(i => i.status === "draft").length} Draft`, color: "#0284c7" }
-                ].map(stat => (
-                  <div key={stat.label} className="flex items-center justify-between">
-                    <span className="text-xs text-black/60 font-mono">{stat.label}</span>
-                    <span className="text-xs font-semibold">{stat.value}</span>
-                  </div>
-                ))}
+                {isLoadingWritings || isErrorWritings ? (
+                  <p className="text-xs text-black/40 font-mono">{isLoadingWritings ? "Loading…" : "Unavailable"}</p>
+                ) : (
+                  [
+                    { label: "Total Seeds", value: `${writings.length}` },
+                    { label: "Ready Queue", value: `${writings.filter(w => w.readiness === "ready_to_show").length} Pieces` },
+                    { label: "Open Issues", value: `${issues.filter(i => i.status === "draft").length} Draft` }
+                  ].map(stat => (
+                    <div key={stat.label} className="flex items-center justify-between">
+                      <span className="text-xs text-black/60 font-mono">{stat.label}</span>
+                      <span className="text-xs font-semibold">{stat.value}</span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}
