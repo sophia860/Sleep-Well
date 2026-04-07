@@ -5148,29 +5148,14 @@ app.get("/api/garden/last-draft", isAuthenticated, async (req: any, res) => {
     },
   );
 
-  app.get("/api/writings/:id/pause-stones", async (req: any, res) => {
+  app.get("/api/writings/:id/pause-stones", isAuthenticated, async (req: any, res) => {
     try {
       const count = await storage.getPauseStoneCount(req.params.id);
-      const hasPlaced = req.user?.claims?.sub
-        ? await storage.hasUserPausedStone(req.params.id, req.user.id)
-        : false;
+      const hasPlaced = await storage.hasUserPausedStone(req.params.id, req.user.id);
       res.json({ count, hasPlaced });
     } catch (error) {
       console.error("Error fetching pause stones:", error);
       res.status(500).json({ message: "Failed to fetch pause stones" });
-    }
-  });
-
-  app.post("/api/writings/pause-stone-counts", async (req, res) => {
-    try {
-      const { writingIds } = req.body;
-      if (!Array.isArray(writingIds))
-        return res.status(400).json({ message: "writingIds array required" });
-      const counts = await storage.getPauseStoneCounts(writingIds);
-      res.json(counts);
-    } catch (error) {
-      console.error("Error fetching pause stone counts:", error);
-      res.status(500).json({ message: "Failed to fetch pause stone counts" });
     }
   });
 
