@@ -18,7 +18,7 @@ This app deploys to **Render.com** automatically on push to `main`.
 
 ## Node Version
 
-Node 18 (set in `nixpacks.toml` via `nixPkgs = ["nodejs-18_x"]`).
+Node 20 (set in `nixpacks.toml` via `nixPkgs = ["nodejs-20_x"]`).
 
 ## Environment Variables
 
@@ -42,3 +42,19 @@ Key vars to set in Render:
 - `nixpacks.toml` is **not** a Railway config — it is used by Render's Nixpacks builder for node version and build phase control.
 - Do **not** use Replit for production. The `.replit` file in this repo is legacy and unused.
 - Health check endpoint: `GET /health` (used for Render keep-warm pings).
+
+## Why Changes May Not Appear on the Live Site
+
+If changes are pushed but do not appear on `www.thepagegalleryjournal.com`, check the following:
+
+1. **Is the change on `main`?**  
+   Render only deploys from the `main` branch. Changes on feature branches (e.g. `copilot/*`) must be merged to `main` via a pull request before they are deployed. Draft PRs are not merged automatically — they need to be reviewed and merged.
+
+2. **Is the Render build succeeding?**  
+   Check the [Render dashboard](https://dashboard.render.com/web/srv-d6u05c450q8c73fo69q0) for build logs. If the build fails, the previous working version stays live.  
+   Common causes of build failure:
+   - **TypeScript/JavaScript syntax errors in `client/src/App.tsx`** — e.g. duplicate `const` declarations. Duplicate variable names are syntax errors in JavaScript that cause the Vite build to fail. Always check `App.tsx` for accidental duplicate lazy imports when adding new pages.
+   - Missing environment variables (set these in the Render dashboard, not in `.env` files).
+
+3. **Is the TypeScript Sentinel passing?**  
+   Run `npx tsc --noEmit` locally before merging to `main`. If it fails, the Vite build will also fail and Render will not deploy. Fix all TypeScript errors before merging.
