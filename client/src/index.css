@@ -30,42 +30,42 @@
     --space-6: 48px;
     --space-10: 80px;
 
-  /* Teal-Indigo Watercolor Night — bioluminescent garden palette */
-      --color-background: #000000;
-  --color-foreground: #ffffff;
-  
-  --color-card: #112838;
-  --color-card-foreground: #ffffff;
-  
-  --color-popover: #0d1e2d;
-  --color-popover-foreground: #ffffff;
-  
-  --color-primary: #ffffff;
-  --color-primary-foreground: #0d1e2d;
-  
-  --color-secondary: #ffffff;
-  --color-secondary-foreground: #ffffff;
-  
-  --color-muted: #1a3040;
-  --color-muted-foreground: #a8b8c8;
-  
-      /* Accent split: CTA green + ornament gold */
-    --color-accent-cta: #335B3B;
-    --color-accent-ornament: #c4a24d;
-    --color-accent: #335B3B;
-  --color-accent-foreground: #ffffff;
+  /* Midnight Editorial — premium literary journal palette */
+  --color-background: #060b14;
+  --color-foreground: #f0ede8;
+
+  --color-card: #0d1826;
+  --color-card-foreground: #f0ede8;
+
+  --color-popover: #0a1520;
+  --color-popover-foreground: #f0ede8;
+
+  --color-primary: #f0ede8;
+  --color-primary-foreground: #060b14;
+
+  --color-secondary: #f0ede8;
+  --color-secondary-foreground: #060b14;
+
+  --color-muted: #162032;
+  --color-muted-foreground: #8ba4be;
+
+  /* Accent split: CTA forest green + ornament gold */
+  --color-accent-cta: #1e5c35;
+  --color-accent-ornament: #d4a853;
+  --color-accent: #1e5c35;
+  --color-accent-foreground: #f0ede8;
 
   /* Extended semantic tokens */
-  --color-garden-bloom: #5eb5a0;   /* teal — published / bloom state */
+  --color-garden-bloom: #38b8a0;   /* teal — published / bloom state */
   --color-agent-lavender: #8b7ec8; /* lavender — AI agent UI */
-  
+
   --color-destructive: hsl(0 60% 50%);
   --color-destructive-foreground: hsl(0 0% 98%);
 
-  --color-border: #1a3040;
-  --color-input: #1a3040;
-      --color-ring: #335B3B;
-  
+  --color-border: rgba(240,237,232,0.08);
+  --color-input: #162032;
+  --color-ring: #d4a853;
+
   --radius: 0.5rem;
 }
 
@@ -438,6 +438,127 @@
     .atelier-series-hover:hover::after {
       opacity: 0.3;
     }
+  }
+
+  /* ─── Editorial Design System ─── */
+  .editorial-rule {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(212,168,83,0.3) 30%, rgba(212,168,83,0.5) 50%, rgba(212,168,83,0.3) 70%, transparent 100%);
+  }
+
+  .editorial-rule-thin {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(240,237,232,0.12) 50%, transparent 100%);
+  }
+
+  .surface-card {
+    background: rgba(13,24,38,0.8);
+    border: 1px solid rgba(240,237,232,0.08);
+    backdrop-filter: blur(12px);
+  }
+
+  .surface-elevated {
+    background: rgba(18,32,50,0.9);
+    border: 1px solid rgba(240,237,232,0.1);
+    backdrop-filter: blur(20px);
+  }
+
+  .gradient-text-gold {
+    background: linear-gradient(135deg, #d4a853 0%, #e8c870 40%, #c9953a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-cream {
+    background: linear-gradient(135deg, #f0ede8 0%, #d4cfc8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .section-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(212,168,83,0.7);
+  }
+
+  .editorial-number {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    color: rgba(240,237,232,0.2);
+  }
+
+  @keyframes shimmer-gold {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  .animate-shimmer-gold {
+    background: linear-gradient(90deg, #d4a853 0%, #f0d882 40%, #d4a853 60%, #c9953a 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer-gold 4s linear infinite;
+  }
+
+  @keyframes float-gentle {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .animate-float-gentle {
+    animation: float-gentle 6s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse-gold {
+    0%, 100% { box-shadow: 0 0 20px rgba(212,168,83,0.1); }
+    50% { box-shadow: 0 0 40px rgba(212,168,83,0.2), 0 0 80px rgba(212,168,83,0.05); }
+  }
+
+  .animate-glow-gold {
+    animation: glow-pulse-gold 4s ease-in-out infinite;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0px); }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .ink-underline {
+    text-decoration: none;
+    background-image: linear-gradient(90deg, rgba(212,168,83,0.6), rgba(212,168,83,0.6));
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    transition: background-size 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ink-underline:hover {
+    background-size: 100% 1px;
+  }
+
+  .nav-link-active::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: rgba(212,168,83,0.6);
+    margin-top: 2px;
   }
 }
 
@@ -2092,23 +2213,23 @@ html:not(.light-theme) .prose-content h3 {
 body:not(.light-theme) .text-white\/20,
 body:not(.light-theme) .text-white\/25,
 body:not(.light-theme) .text-white\/30 {
-  color: rgba(255, 255, 255, 0.70) !important;
+  color: rgba(240, 237, 232, 0.70) !important;
 }
 body:not(.light-theme) .text-white\/40 {
-  color: rgba(255, 255, 255, 0.75) !important;
+  color: rgba(240, 237, 232, 0.75) !important;
 }
 body:not(.light-theme) .text-white\/50,
 body:not(.light-theme) .text-white\/55,
 body:not(.light-theme) .text-white\/60 {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: rgba(240, 237, 232, 0.85) !important;
 }
 body:not(.light-theme) .text-white\/70 {
-  color: rgba(255, 255, 255, 0.90) !important;
+  color: rgba(240, 237, 232, 0.90) !important;
 }
 body:not(.light-theme) .text-white\/80,
 body:not(.light-theme) .text-white\/85,
 body:not(.light-theme) .text-white\/90 {
-  color: rgba(255, 255, 255, 0.95) !important;
+  color: rgba(240, 237, 232, 0.95) !important;
 }
 
 /* ── Lift dim amber/gold text to visible, bright levels ── */
@@ -2132,70 +2253,48 @@ body:not(.light-theme) .text-amber-200 {
   color: #fde68a !important;
 }
 
-/* ── Footer specific: ensure all footer text is white/bright ── */
-body:not(.light-theme) footer,
-body:not(.light-theme) footer p,
-body:not(.light-theme) footer span,
-body:not(.light-theme) footer a,
-body:not(.light-theme) footer li,
-body:not(.light-theme) footer h3,
-body:not(.light-theme) footer label {
-  color: rgba(255, 255, 255, 0.90) !important;
-}
-body:not(.light-theme) footer a:hover {
-  color: #ffffff !important;
-}
-body:not(.light-theme) footer .text-white\/50,
-body:not(.light-theme) footer [class*="text-white/"] {
-  color: rgba(255, 255, 255, 0.85) !important;
-}
+/* ── Footer specific: let new editorial footer use its own inline styles ── */
 
-/* ── Navigation: ensure nav text is bright ── */
-body:not(.light-theme) nav,
-body:not(.light-theme) nav a,
-body:not(.light-theme) nav span,
-body:not(.light-theme) nav button {
-  color: rgba(255, 255, 255, 0.92) !important;
-}
+/* ── Navigation: let new editorial nav use its own inline styles ── */
 
 /* ── Cards: bump dim body text inside cards ── */
 body:not(.light-theme) .bg-card p,
 body:not(.light-theme) .bg-card span,
 body:not(.light-theme) .bg-card li {
-  color: rgba(255, 255, 255, 0.88) !important;
+  color: rgba(240, 237, 232, 0.88) !important;
 }
 body:not(.light-theme) .bg-card h1,
 body:not(.light-theme) .bg-card h2,
 body:not(.light-theme) .bg-card h3,
 body:not(.light-theme) .bg-card h4 {
-  color: #ffffff !important;
+  color: #f0ede8 !important;
 }
 
-/* ── Global: any text-foreground in dark mode should be white ── */
+/* ── Global: any text-foreground in dark mode should be cream ── */
 body:not(.light-theme) .text-foreground {
-  color: #ffffff !important;
+  color: #f0ede8 !important;
 }
 body:not(.light-theme) .text-muted-foreground {
-  color: rgba(255, 255, 255, 0.72) !important;
+  color: rgba(240, 237, 232, 0.72) !important;
 }
 
-/* ── Section headers: always fully white in dark mode ── */
+/* ── Section headers: cream in dark mode ── */
 body:not(.light-theme) h1,
 body:not(.light-theme) h2,
 body:not(.light-theme) h3,
 body:not(.light-theme) h4,
 body:not(.light-theme) h5,
 body:not(.light-theme) h6 {
-  color: #ffffff;
+  color: #f0ede8;
 }
 
-/* ── Body paragraphs and list items: bright soft white ── */
+/* ── Body paragraphs and list items: bright soft cream ── */
 body:not(.light-theme) p,
 body:not(.light-theme) li,
 body:not(.light-theme) label,
 body:not(.light-theme) td,
 body:not(.light-theme) th {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(240, 237, 232, 0.92);
 }
 
 /* ── Span elements: ensure not too dim ── */
