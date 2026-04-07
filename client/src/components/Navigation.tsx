@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Menu, X, Sun, Moon, Bell } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
@@ -18,6 +18,10 @@ export default function Navigation() {
     return false;
   });
 
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (isLight) {
       document.documentElement.classList.add("light-theme");
@@ -27,6 +31,32 @@ export default function Navigation() {
       localStorage.setItem("theme", "dark");
     }
   }, [isLight]);
+
+  // Update scrolled state on scroll
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    function handleOutsideClick(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setShowNotifs(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location]);
 
   const { data: roleData } = useQuery<{ role: string; tier: string }>({
     queryKey: ["/api/user/role"],
@@ -123,11 +153,13 @@ export default function Navigation() {
             </button>
 
             {user && (
-              <div className="relative">
+              <div className="relative" ref={notifRef}>
                 <button
                   onClick={() => setShowNotifs(!showNotifs)}
                   className="p-2 text-white/90 hover:text-white/80 transition-colors relative"
                   aria-label={`Notifications${(notifData?.unread || 0) > 0 ? `, ${notifData!.unread} unread` : ''}`}               data-testid="button-notifications"
+                  aria-haspopup="true"
+                  aria-expanded={showNotifs}
                 >
                   <Bell size={16} />
                   {(notifData?.unread || 0) > 0 && (
@@ -165,8 +197,14 @@ export default function Navigation() {
 
             {!isLoading && (
               isAuthenticated && user ? (
-                <div className="relative group/user">
-                  <button className="flex items-center gap-2 p-1 pl-3 rounded-full border border-white/10 hover:border-white/20 transition-all bg-white/5" data-testid="nav-user-dropdown">
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    onClick={() => setShowUserMenu((v) => !v)}
+                    className="flex items-center gap-2 p-1 pl-3 rounded-full border border-white/10 hover:border-white/20 transition-all bg-white/5"
+                    data-testid="nav-user-dropdown"
+                    aria-haspopup="true"
+                    aria-expanded={showUserMenu}
+                  >
                     <span className="font-mono text-[length:var(--text-label)] tracking-[0.15em] text-white/90">
                       {(user as any).username?.slice(0, 1) || (user as any).email?.slice(0, 1) || "U"}
                     </span>
@@ -175,18 +213,20 @@ export default function Navigation() {
                     </div>
                   </button>
                   
-                  <div className="absolute right-0 top-full mt-0 pt-2 w-48 bg-popover/95 backdrop-blur-2xl border border-white/[0.08] rounded-xl shadow-2xl shadow-black/40 z-50 py-2 opacity-0 translate-y-2 pointer-events-none group-hover/user:opacity-100 group-hover/user:translate-y-0 group-hover/user:pointer-events-auto transition-all duration-300">
-                    <Link href={`/writer/${user.id}`} className="block px-4 py-2 text-white/90 hover:text-white hover:bg-white/5 transition-colors font-mono text-[length:var(--text-label)] tracking-[0.15em]">
-                      Profile
-                    </Link>
-                    <Link href="/settings" className="block px-4 py-2 text-white/90 hover:text-white hover:bg-white/5 transition-colors font-mono text-[length:var(--text-label)] tracking-[0.15em]">
-                      Settings
-                    </Link>
-                    <div className="h-[1px] bg-white/5 my-1" />
-                    <a href="/api/logout" className="block px-4 py-2 text-white/90 hover:text-white/90 hover:bg-white/5 transition-colors font-mono text-[length:var(--text-label)] tracking-[0.15em]" data-testid="nav-logout">
-                      Sign Out
-                    </a>
-                  </div>
+                  {showUserMenu && (
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-popover/95 backdrop-blur-2xl border border-white/[0.08] rounded-xl shadow-2xl shadow-black/40 z-50 py-2">
+                      <Link href={`/writer/${user.id}`} onClick={() => setShowUserMenu(false)} className="block px-4 py-2 text-white/90 hover:text-white hover:bg-white/5 transition-colors font-mono text-[length:var(--text-label)] tracking-[0.15em]">
+                        Profile
+                      </Link>
+                      <Link href="/settings" onClick={() => setShowUserMenu(false)} className="block px-4 py-2 text-white/90 hover:text-white hover:bg-white/5 transition-colors font-mono text-[length:var(--text-label)] tracking-[0.15em]">
+                        Settings
+                      </Link>
+                      <div className="h-[1px] bg-white/5 my-1" />
+                      <a href="/api/logout" className="block px-4 py-2 text-white/90 hover:text-white/90 hover:bg-white/5 transition-colors font-mono text-[length:var(--text-label)] tracking-[0.15em]" data-testid="nav-logout">
+                        Sign Out
+                      </a>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <Link href="/sign-in" className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-white/90 hover:text-white hover:bg-white/10 transition-all font-mono text-[length:var(--text-label)] tracking-[0.15em]" data-testid="nav-login">
@@ -198,7 +238,8 @@ export default function Navigation() {
 
           <button 
             onClick={() => setIsOpen(true)}
-            className="lg:hidden p-2 text-white hover:bg-white/10 rounded-full transition-colors mix-blend-difference"           aria-label="Open menu"
+            className="lg:hidden p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+            aria-label="Open menu"
           >
             <Menu />
           </button>
