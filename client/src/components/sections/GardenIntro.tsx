@@ -187,7 +187,7 @@ export default function GardenIntro() {
         navigate("/sign-in?next=/garden");
         return;
       }
-      if (!res.ok) throw new Error("Session check failed");
+      if (!res.ok) throw new Error(`Session check failed: ${res.status} ${res.statusText}`);
       setNavStatus("idle");
       navigate("/garden");
     } catch {
@@ -195,11 +195,16 @@ export default function GardenIntro() {
     }
   }, [navStatus, navigate]);
 
-  const statusMessage =
-    navStatus === "loading" ? "Opening your Garden\u2026" :
-    navStatus === "auth-required" ? "Please sign in to open your Garden." :
-    navStatus === "error" ? "We could not open your Garden. Please try again." :
-    null;
+  function gardenStatusMessage(status: GardenNavStatus): string | null {
+    switch (status) {
+      case "loading": return "Opening your Garden\u2026";
+      case "auth-required": return "Please sign in to open your Garden.";
+      case "error": return "We could not open your Garden. Please try again.";
+      default: return null;
+    }
+  }
+
+  const statusMessage = gardenStatusMessage(navStatus);
 
   return (
     <section className="relative py-32 md:py-48 px-6 md:px-12 overflow-hidden">

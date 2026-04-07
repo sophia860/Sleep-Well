@@ -25,7 +25,7 @@ export default function Hero() {
         navigate("/sign-in?next=/garden");
         return;
       }
-      if (!res.ok) throw new Error("Session check failed");
+      if (!res.ok) throw new Error(`Session check failed: ${res.status} ${res.statusText}`);
       setNavStatus("idle");
       navigate("/garden");
     } catch {
@@ -76,9 +76,13 @@ export default function Hero() {
     );
   }, []);
 
-  const writingLabel =
-    navStatus === "loading" ? "Opening\u2026" :
-    !authLoading && user ? "Open the Garden editor" : "Start Writing \u2014 it\u2019s free";
+  function gardenWritingLabel(status: GardenNavStatus, isAuthLoading: boolean, isUser: boolean): string {
+    if (status === "loading") return "Opening\u2026";
+    if (!isAuthLoading && isUser) return "Open the Garden editor";
+    return "Start Writing \u2014 it\u2019s free";
+  }
+
+  const writingLabel = gardenWritingLabel(navStatus, authLoading, !!user);
 
   return (
     <div ref={heroRef} className="relative">
