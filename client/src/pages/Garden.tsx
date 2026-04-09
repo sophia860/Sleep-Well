@@ -24,7 +24,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import PlantingFlow, { VisibilityBadge } from "@/components/garden/PlantingFlow";
 import { NotificationBell } from "@/components/garden/NotificationPanel";
 import NotificationPanel from "@/components/garden/NotificationPanel";
-import { ResonanceBar, MarginaliaSection, TendButton } from "@/components/garden/SocialFeatures";
+import { ResonanceBar, MarginaliaSection, TendButton, BookmarkButton } from "@/components/garden/SocialFeatures";
 import { TablesRoom, WorkshopRoom, SwapRoom, TheDeskRoom, FirstReaderRoom, ReadingShelfRoom } from "@/components/garden/CommunityRooms";
 import RichEditor, { ContentRenderer, stripHtml, wordCountFromContent } from "@/components/garden/RichEditor";
 import ExportMenu from "@/components/garden/ExportMenu";
@@ -1731,7 +1731,7 @@ function QuietlyReadIndicator({ writingId }: { writingId: string }) {
   );
 }
 
-type ReadingRoomSort = "recent" | "quiet" | "tended";
+type ReadingRoomSort = "recent" | "quiet" | "tended" | "saved";
 const readingRoomGenres = ["all", "poetry", "fiction", "essay", "hybrid", "fragment", "other"];
 
 function CuratedOpportunitiesBanner() {
@@ -1903,7 +1903,18 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
     },
   });
 
-  if (loadingTending || loadingGarden || loadingDailyLetter) return <ReadingRoomSkeleton />;
+  type BookshelfEntry = { id: string; writingId: string; savedAt: string; title: string | null; content: string; genre: string | null; authorId: string; authorName: string | null };
+  const { data: bookshelf = [], isLoading: loadingBookshelf } = useQuery<BookshelfEntry[]>({
+    queryKey: ["/api/bookshelf"],
+    queryFn: async () => {
+      const res = await fetch("/api/bookshelf", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch bookshelf");
+      return res.json();
+    },
+    enabled: activeSort === "saved",
+  });
+
+  if (loadingTending || loadingGarden || loadingDailyLetter || (activeSort === "saved" && loadingBookshelf)) return <ReadingRoomSkeleton />;
 
   const tendedAuthorIds = new Set(tendingFeed.map(p => p.authorId));
 
@@ -1942,6 +1953,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
     { id: "recent", label: "Recent" },
     { id: "quiet", label: "Quiet" },
     { id: "tended", label: "Tended" },
+    { id: "saved", label: "Saved" },
   ];
 
   const dailyLetterContentWords = dailyLetter ? wordCount(dailyLetter.content) : 0;
@@ -2073,32 +2085,108 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
         </div>
       </div>
 
-      {allPieces.length === 0 && (
-        <div className="relative border border-dashed border-emerald-700/15 rounded-3xl p-16 text-center space-y-4 overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 80%, rgba(6,78,59,0.06) 0%, transparent 60%)" }} />
-          <Feather size={32} className="relative mx-auto text-emerald-500/25" />
-          <h3 className="relative text-xl font-semibold tracking-tight text-white/90">No letters yet</h3>
-          <p className="relative font-serif text-sm text-white/90 max-w-sm mx-auto leading-relaxed">
-            When writers share their work to the garden, or you tend someone's garden, their pieces will appear here like letters slid under your door.
-          </p>
-        </div>
-      )}
+      {activeSort === "saved" ? (
+        <>
+          {bookshelf.length === 0 ? (
+            <div className="border border-dashed border-white/[0.06] rounded-2xl p-16 text-center space-y-4" data-testid="saved-pieces-empty">
+              <Bookmark size={32} className="mx-auto text-white/20" />
+              <h3 className="text-lg font-semibold tracking-tight text-white/70">Nothing saved yet</h3>
+              <p className="font-serif text-sm text-white/50 italic max-w-xs mx-auto leading-relaxed">
+                Hover a piece in the Reading Room and click the bookmark icon to save it here.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6" data-testid="saved-pieces-list">
+              {bookshelf.map((entry) => {
+                const isExpanded = expandedId === entry.writingId;
+                return (
+                  <motion.article
+                    key={entry.writingId}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="group/card relative rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all cursor-pointer overflow-hidden"
+                    onClick={() => setExpandedId(isExpanded ? null : entry.writingId)}
+                    data-testid={`saved-piece-${entry.writingId}`}
+                  >
+                    <div className="px-5 md:px-6 py-5 md:py-6">
+                      <div className="flex items-center justify-between gap-3 mb-3">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onViewProfile?.(entry.authorId); }}
+                          className="font-mono text-[10px] uppercase tracking-widest text-white/55 hover:text-white/80 transition-colors"
+                        >
+                          {entry.authorName || "Unknown"}
+                        </button>
+                        <BookmarkButton writingId={entry.writingId} />
+                      </div>
+                      <h3 className="mb-2 text-lg md:text-xl font-semibold tracking-tight text-white/90 leading-snug">
+                        {entry.title || "Untitled"}
+                      </h3>
+                      {isExpanded ? (
+                        <ContentRenderer content={entry.content} maxLength={2000} className="text-white/75 leading-8" />
+                      ) : (
+                        <ContentRenderer content={entry.content} maxLength={250} className="text-white/70 leading-7 line-clamp-3" />
+                      )}
+                      {!isExpanded && (
+                        <div className="flex items-center gap-3 mt-3 opacity-0 group-hover/card:opacity-100 transition-opacity duration-200">
+                          <span className="font-mono text-[8px] uppercase tracking-widest text-white/45">{entry.genre}</span>
+                          <ResonanceBar writingId={entry.writingId} compact />
+                        </div>
+                      )}
+                    </div>
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-5 md:px-6 pb-5 md:pb-6 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <span className="font-mono text-[8px] uppercase tracking-widest text-white/45">{entry.genre}</span>
+                              <TendButton gardenerId={entry.authorId} size="sm" />
+                            </div>
+                            <ResonanceBar writingId={entry.writingId} />
+                            <MarginaliaSection writingId={entry.writingId} authorId={entry.authorId} />
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.article>
+                );
+              })}
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          {allPieces.length === 0 && (
+            <div className="relative border border-dashed border-emerald-700/15 rounded-3xl p-16 text-center space-y-4 overflow-hidden">
+              <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 80%, rgba(6,78,59,0.06) 0%, transparent 60%)" }} />
+              <Feather size={32} className="relative mx-auto text-emerald-500/25" />
+              <h3 className="relative text-xl font-semibold tracking-tight text-white/90">No letters yet</h3>
+              <p className="relative font-serif text-sm text-white/90 max-w-sm mx-auto leading-relaxed">
+                When writers share their work to the garden, or you tend someone's garden, their pieces will appear here like letters slid under your door.
+              </p>
+            </div>
+          )}
 
-      {allPieces.length > 0 && filteredPieces.length === 0 && (
-        <div className="border border-dashed border-white/[0.06] rounded-2xl p-12 text-center space-y-3">
+          {allPieces.length > 0 && filteredPieces.length === 0 && (
+            <div className="border border-dashed border-white/[0.06] rounded-2xl p-12 text-center space-y-3">
 3588
 3588
 
-          <Eye size={24} className="mx-auto text-white/90" />
-          <p className="font-serif text-sm text-white/90 italic">
-            {activeSort === "tended"
-              ? "No pieces from writers you're tending yet. Tend a garden to see their work here."
-              : "No pieces match this filter."}
-          </p>
-        </div>
-      )}
+              <Eye size={24} className="mx-auto text-white/90" />
+              <p className="font-serif text-sm text-white/90 italic">
+                {activeSort === "tended"
+                  ? "No pieces from writers you're tending yet. Tend a garden to see their work here."
+                  : "No pieces match this filter."}
+              </p>
+            </div>
+          )}
 
-      <div className="space-y-6">
+          <div className="space-y-6">
         {visiblePieces.map((piece, i) => {
           const isExpanded = expandedId === piece.id;
           return (
@@ -2156,7 +2244,7 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
                       <span className="w-px h-3 bg-white/[0.06]" />
                       <span className="font-mono text-[8px] uppercase tracking-widest text-white/45">{piece.genre}</span>
                       <ResonanceBar writingId={piece.id} compact />
-                      <MarginaliaCount writingId={piece.id} /><motion.button onClick={(e) => { e.stopPropagation(); apiRequest("POST", "/api/saved", { writingId: piece.id }).then(() => toast({ title: "Saved to your collection" })).catch(() => toast({ title: "Could not save", variant: "destructive" })); }} whileTap={{ scale: 1.3 }} whileHover={{ scale: 1.1 }} className="p-1.5 rounded-lg text-white/30 hover:text-amber-400/70 hover:bg-amber-500/[0.06] transition-all" title="Save piece" data-testid={`button-save-${piece.id}`}><Bookmark size={12} /></motion.button>
+                      <MarginaliaCount writingId={piece.id} /><BookmarkButton writingId={piece.id} />
                       <PauseStoneButton writingId={piece.id} />
                                           <TendButton gardenerId={piece.authorId} />
                       <button
@@ -2216,6 +2304,8 @@ function ReadingRoomZone({ onViewProfile, onGoToRoom }: { onViewProfile?: (userI
             More letters
           </button>
         </div>
+      )}
+        </>
       )}
     </div>
   );

@@ -59,7 +59,6 @@ const EditorialPayment = lazy(() => import("@/pages/EditorialPayment"));
 const EditorialRoom = lazy(() => import("@/pages/EditorialRoom"));
 const Marketplace = lazy(() => import("@/pages/Marketplace"));
 const Challenges = lazy(() => import("@/pages/Challenges"));
-const Publications = lazy(() => import("@/pages/Publications"));
 const Exhibits = lazy(() => import("@/pages/Exhibits"));
 const Exhibit = lazy(() => import("@/pages/Exhibit"));
 const WorkshopRoom = lazy(() => import("@/pages/WorkshopRoom"));
@@ -109,6 +108,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/sign-in": "Sign In — The Page Gallery",
   "/for-journals": "For Journals — The Page Gallery",
   "/saved": "Saved Pieces — The Page Gallery",
+    "/exhibits": "Exhibits — The Page Gallery",
 };
 
 function PageTitle() {
@@ -168,6 +168,8 @@ function Router() {
         <Route path="/reading-room">{() => <ProtectedRoute component={ReadingRoom} path="/reading-room" />}</Route>
         <Route path="/community" component={Community} />
         <Route path="/editorial-dashboard">{() => <EditorProtectedRoute component={EditorialDashboard} path="/editorial-dashboard" />}</Route>
+        {/* /eic-dashboard is a legacy alias — redirect to the canonical route which is
+            itself wrapped in EditorProtectedRoute, so auth is still enforced. */}
         <Route path="/eic-dashboard">
           {() => <Redirect to="/editorial-dashboard" />}
         </Route>
@@ -175,13 +177,11 @@ function Router() {
         <Route path="/editorial-room">{() => <EditorProtectedRoute component={EditorialRoom} path="/editorial-room" />}</Route>
         <Route path="/marketplace" component={Marketplace} />
         <Route path="/challenges" component={Challenges} />
-        <Route path="/publications" component={Publications} />
         <Route path="/exhibits" component={Exhibits} />
         <Route path="/exhibits/:slug" component={Exhibit} />
         <Route path="/workshop-room">{() => <ProtectedRoute component={WorkshopRoom} path="/workshop-room" />}</Route>
         <Route path="/cultivator" component={Cultivator} />
         <Route path="/grove">{() => <ProtectedRoute component={Grove} path="/grove" />}</Route>
-                  <Route path="/atelier" component={Atelier} />
         <Route path="/atelier" component={Atelier} />
         <Route component={NotFound} />
       </Switch>

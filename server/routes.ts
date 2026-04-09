@@ -8553,7 +8553,7 @@ const sharedPieces = await db.select({
   });
 
   registerEditorialRoomRoutes(app);
-    registerServiceInquiryRoutes(app);   registerGalleryFeedbackRoutes(app);   registerGalleryFeedbackRoutes(app);
+      registerServiceInquiryRoutes(app);
     registerEditorialOrderRoutes(app);
     registerWritingLayoutRoutes(app);
     registerWritingExerciseRoutes(app);
@@ -8574,5 +8574,6 @@ const sharedPieces = await db.select({
     registerPoetMonetisationRoutes(app);
     registerInstagramSquaresRoutes(app);
     registerAuthorEditorConversationRoutes(app);
-  registerTakeoverScreenRoutes(app);return httpServer;  registerMarketplaceRoutes(app);
+  registerTakeoverScreenRoutes(app);
+  return httpServer;
 }

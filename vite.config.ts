@@ -5,7 +5,8 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { metaImagesPlugin } from "./vite-plugin-meta-images";
 
-export default defineConfig({
+// @ts-ignore -- defineConfig supports async in Vite 5+ but types lag behind
+export default defineConfig(async () => ({
   plugins: [
     react(),
     tailwindcss(),
@@ -13,14 +14,14 @@ export default defineConfig({
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [
-                runtimeErrorOverlay(),
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
-          ),
-          await import("@replit/vite-plugin-dev-banner").then((m) =>
-            m.devBanner(),
-          ),
-        ]
+              runtimeErrorOverlay(),
+              await import("@replit/vite-plugin-cartographer").then((m) =>
+                m.cartographer(),
+              ),
+              await import("@replit/vite-plugin-dev-banner").then((m) =>
+                m.devBanner(),
+              ),
+            ]
       : []),
   ],
   resolve: {
@@ -43,4 +44,4 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
-});
+}));

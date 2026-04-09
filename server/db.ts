@@ -1315,61 +1315,119 @@ export async function runMigrations() {
     }
 
     // --- Auto-migration: atelier_series new columns ---
+    // Each ALTER has its own try/catch (consistent with the rest of runMigrations) so a
+    // failure on one column doesn't silently skip the remaining columns.
     try {
-      await pool.query(`
-        ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS created_by_id varchar NOT NULL DEFAULT '';
-      `);
-      await pool.query(`
-        ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS facilitator text NOT NULL DEFAULT 'The Editors';
-      `);
-      await pool.query(`
-        ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS free_exercise_limit integer NOT NULL DEFAULT 2;
-      `);
-      await pool.query(`
-        ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS genre text NOT NULL DEFAULT 'any';
-      `);
-      await pool.query(`
-        ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS is_published boolean NOT NULL DEFAULT false;
-      `);
-      await pool.query(`
-        ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS sort_order integer NOT NULL DEFAULT 0;
-      `);
-      await pool.query(`
-        ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS subtitle text;
-      `);
-      await pool.query(`
-        ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS theme text;
-      `);
-      await pool.query(`
-        ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS total_exercises integer NOT NULL DEFAULT 0;
-      `);
+      await pool.query(`ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS created_by_id varchar NOT NULL DEFAULT '';`);
     } catch (e) {
       if (!isBenignMigrationError(e)) {
-        console.error('[MIGRATION CRITICAL]: ALTER atelier_series failed:', (e as Error).message);
+        console.error('[MIGRATION CRITICAL]: ALTER atelier_series created_by_id failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS facilitator text NOT NULL DEFAULT 'The Editors';`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER atelier_series facilitator failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS free_exercise_limit integer NOT NULL DEFAULT 2;`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER atelier_series free_exercise_limit failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS genre text NOT NULL DEFAULT 'any';`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER atelier_series genre failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS is_published boolean NOT NULL DEFAULT false;`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER atelier_series is_published failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS sort_order integer NOT NULL DEFAULT 0;`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER atelier_series sort_order failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS subtitle text;`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER atelier_series subtitle failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS theme text;`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER atelier_series theme failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE atelier_series ADD COLUMN IF NOT EXISTS total_exercises integer NOT NULL DEFAULT 0;`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER atelier_series total_exercises failed:', (e as Error).message);
         migrationErrors++;
       }
     }
 
     // --- Auto-migration: editorial_briefs new columns ---
     try {
-      await pool.query(`
-        ALTER TABLE editorial_briefs ADD COLUMN IF NOT EXISTS display_intro text NOT NULL DEFAULT '';
-      `);
-      await pool.query(`
-        ALTER TABLE editorial_briefs ADD COLUMN IF NOT EXISTS draft_by_agent text;
-      `);
-      await pool.query(`
-        ALTER TABLE editorial_briefs ADD COLUMN IF NOT EXISTS issue_id varchar;
-      `);
-      await pool.query(`
-        ALTER TABLE editorial_briefs ADD COLUMN IF NOT EXISTS seo_excerpt text NOT NULL DEFAULT '';
-      `);
-      await pool.query(`
-        ALTER TABLE editorial_briefs ADD COLUMN IF NOT EXISTS updated_at timestamp DEFAULT now();
-      `);
+      await pool.query(`ALTER TABLE editorial_briefs ADD COLUMN IF NOT EXISTS display_intro text NOT NULL DEFAULT '';`);
     } catch (e) {
       if (!isBenignMigrationError(e)) {
-        console.error('[MIGRATION CRITICAL]: ALTER editorial_briefs failed:', (e as Error).message);
+        console.error('[MIGRATION CRITICAL]: ALTER editorial_briefs display_intro failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE editorial_briefs ADD COLUMN IF NOT EXISTS draft_by_agent text;`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER editorial_briefs draft_by_agent failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE editorial_briefs ADD COLUMN IF NOT EXISTS issue_id varchar;`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER editorial_briefs issue_id failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE editorial_briefs ADD COLUMN IF NOT EXISTS seo_excerpt text NOT NULL DEFAULT '';`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER editorial_briefs seo_excerpt failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE editorial_briefs ADD COLUMN IF NOT EXISTS updated_at timestamp DEFAULT now();`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER editorial_briefs updated_at failed:', (e as Error).message);
         migrationErrors++;
       }
     }
@@ -1412,15 +1470,18 @@ export async function runMigrations() {
 
     // --- Auto-migration: service_bookings new columns ---
     try {
-      await pool.query(`
-        ALTER TABLE service_bookings ADD COLUMN IF NOT EXISTS delivered_at timestamp;
-      `);
-      await pool.query(`
-        ALTER TABLE service_bookings ADD COLUMN IF NOT EXISTS updated_at timestamp DEFAULT now();
-      `);
+      await pool.query(`ALTER TABLE service_bookings ADD COLUMN IF NOT EXISTS delivered_at timestamp;`);
     } catch (e) {
       if (!isBenignMigrationError(e)) {
-        console.error('[MIGRATION CRITICAL]: ALTER service_bookings failed:', (e as Error).message);
+        console.error('[MIGRATION CRITICAL]: ALTER service_bookings delivered_at failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
+      await pool.query(`ALTER TABLE service_bookings ADD COLUMN IF NOT EXISTS updated_at timestamp DEFAULT now();`);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: ALTER service_bookings updated_at failed:', (e as Error).message);
         migrationErrors++;
       }
     }
@@ -1452,6 +1513,13 @@ export async function runMigrations() {
           updated_at timestamp DEFAULT now()
         )
       `);
+    } catch (e) {
+      if (!isBenignMigrationError(e)) {
+        console.error('[MIGRATION CRITICAL]: T20 author_editor_conversations failed:', (e as Error).message);
+        migrationErrors++;
+      }
+    }
+    try {
       await pool.query(`
         CREATE TABLE IF NOT EXISTS author_editor_messages (
           id varchar PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1465,7 +1533,7 @@ export async function runMigrations() {
       `);
     } catch (e) {
       if (!isBenignMigrationError(e)) {
-        console.error('[MIGRATION CRITICAL]: T20 author_editor_conversations failed:', (e as Error).message);
+        console.error('[MIGRATION CRITICAL]: T20 author_editor_messages failed:', (e as Error).message);
         migrationErrors++;
       }
     }

@@ -13,6 +13,7 @@ import { stripHtml, wordCountFromContent } from "@/components/garden/RichEditor"
 import { format } from "date-fns";
 import { apiRequest } from "@/lib/queryClient";
 import { toast } from "@/hooks/use-toast";
+import LoadingScreen from "@/components/garden/LoadingScreen";
 
 type StudioBucket = "all" | "triage" | "development" | "ready" | "published";
 
@@ -34,7 +35,8 @@ export default function EditorStudio() {
   const queryClient = useQueryClient();
   const [bucket, setBucket] = useState<StudioBucket>("all");
   const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedWritingId, setSelectedWritingId] = useState<string | null>(null);
+  const [selectedIssueId, setSelectedIssueId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"pipeline" | "greenhouse" | "requests" | "issues">("pipeline");
   const [showNewIssueForm, setShowNewIssueForm] = useState(false);
   const [newIssueTitle, setNewIssueTitle] = useState("");
@@ -80,7 +82,7 @@ export default function EditorStudio() {
   }, [writings, bucket, search]);
 
   // Selected issue
-  const selectedIssue = useMemo(() => issues.find(i => i.id === selectedId) ?? null, [issues, selectedId]);
+  const selectedIssue = useMemo(() => issues.find(i => i.id === selectedIssueId) ?? null, [issues, selectedIssueId]);
 
   // Mutations
   const publishIssueMutation = useMutation({
@@ -114,6 +116,14 @@ export default function EditorStudio() {
       toast({ title: "Failed to create issue", variant: "destructive" });
     },
   });
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-[#f7f4ee] flex items-center justify-center">
+        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-black/40">Loading…</p>
+      </main>
+    );
+  }
 
   if (!isLoading && (!user || (user.role !== "editor" && user.role !== "editor_in_chief"))) {
     return (
@@ -161,7 +171,8 @@ export default function EditorStudio() {
 
       <div className="flex-1 max-w-7xl mx-auto w-full p-6 grid lg:grid-cols-[1fr,400px] gap-6">
         <section className="space-y-6">
-          {/* View Search/Filter */}
+          {/* View Search/Filter — only relevant for Pipeline */}
+          {activeTab === "pipeline" && (
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30" />
@@ -177,6 +188,7 @@ export default function EditorStudio() {
               <Filter size={18} className="text-black/60" />
             </button>
           </div>
+          )}
 
           {/* Dynamic Content Based on Tab */}
           <div className="bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden min-h-[600px]">
@@ -201,24 +213,24 @@ export default function EditorStudio() {
                     filteredWritings.map(w => (
                       <div
                         key={w.id}
-                        onClick={() => { setSelectedId(w.id); setActiveTab("pipeline"); }}
-                        className={`flex items-start justify-between p-4 rounded-2xl border cursor-pointer transition-all ${selectedId === w.id ? "bg-black text-white border-black" : "bg-[#f9f8f4] border-black/5 hover:border-black/20"}`}
+                        onClick={() => { setSelectedWritingId(w.id); setActiveTab("pipeline"); }}
+                        className={`flex items-start justify-between p-4 rounded-2xl border cursor-pointer transition-all ${selectedWritingId === w.id ? "bg-black text-white border-black" : "bg-[#f9f8f4] border-black/5 hover:border-black/20"}`}
                       >
                         <div className="space-y-1 flex-1 min-w-0">
-                          <p className={`text-sm font-medium truncate ${selectedId === w.id ? "text-white" : "text-black"}`}>{w.title}</p>
+                          <p className={`text-sm font-medium truncate ${selectedWritingId === w.id ? "text-white" : "text-black"}`}>{w.title}</p>
                           {w.authorName && (
-                            <p className={`text-[10px] font-mono ${selectedId === w.id ? "text-white/60" : "text-black/40"}`}>{w.authorName}</p>
+                            <p className={`text-[10px] font-mono ${selectedWritingId === w.id ? "text-white/60" : "text-black/40"}`}>{w.authorName}</p>
                           )}
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className={`px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest border ${selectedId === w.id ? "border-white/20 text-white/70" : "border-black/10 text-black/40"}`}>{w.genre}</span>
-                            <span className={`px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest border ${selectedId === w.id ? "border-white/20 text-white/70" : "border-black/10 text-black/40"}`}>{w.readiness.replace(/_/g, " ")}</span>
+                            <span className={`px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest border ${selectedWritingId === w.id ? "border-white/20 text-white/70" : "border-black/10 text-black/40"}`}>{w.genre}</span>
+                            <span className={`px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest border ${selectedWritingId === w.id ? "border-white/20 text-white/70" : "border-black/10 text-black/40"}`}>{w.readiness.replace(/_/g, " ")}</span>
                             {w.editorialAvailable && (
-                              <span className={`px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest ${selectedId === w.id ? "bg-white/20 text-white" : "bg-green-50 border border-green-200 text-green-700"}`}>editorial open</span>
+                              <span className={`px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest ${selectedWritingId === w.id ? "bg-white/20 text-white" : "bg-green-50 border border-green-200 text-green-700"}`}>editorial open</span>
                             )}
                           </div>
                         </div>
-                        <div className={`text-[10px] font-mono ml-4 shrink-0 ${selectedId === w.id ? "text-white/50" : "text-black/30"}`}>
-                          {w.createdAt ? format(new Date(w.createdAt), "MMM d") : ""}
+                        <div className={`text-[10px] font-mono ml-4 shrink-0 ${selectedWritingId === w.id ? "text-white/50" : "text-black/30"}`}>
+                          {w.createdAt && !isNaN(new Date(w.createdAt).getTime()) ? format(new Date(w.createdAt), "MMM d") : ""}
                         </div>
                       </div>
                     ))
@@ -231,18 +243,38 @@ export default function EditorStudio() {
               <div className="p-8">
                 <h2 className="text-2xl font-semibold mb-2">The Greenhouse</h2>
                 <p className="text-sm text-black/50 mb-8">Your private editorial shortlist. No authors are notified of activity here.</p>
-                <div className="grid sm:grid-cols-2 gap-4">
-                   {/* Greenhouse grouping slots */}
-                   {['Winter 2026', 'Spring 2026', 'Unsorted'].map(group => (
-                     <div key={group} className="bg-[#f9f8f4] p-5 rounded-2xl border border-black/5">
-                       <h3 className="font-mono text-[10px] uppercase tracking-widest text-black/40 mb-4">{group}</h3>
-                       <div className="text-center py-10 border border-dashed border-black/10 rounded-xl">
-                         <Sprout size={20} className="mx-auto text-black/10 mb-2" />
-                         <p className="text-[10px] font-mono text-black/20 uppercase">Drag seeds here</p>
-                       </div>
-                     </div>
-                   ))}
-                </div>
+                {greenhouse.length === 0 ? (
+                  <div className="text-center py-20 text-black/30 font-mono text-[10px] uppercase tracking-widest">No pieces in the greenhouse yet</div>
+                ) : (
+                  <div className="space-y-3">
+                    {greenhouse.map(entry => {
+                      const writing = writings.find(w => w.id === entry.writingId);
+                      return (
+                        <div key={entry.id} className="flex items-start justify-between p-4 bg-[#f9f8f4] rounded-2xl border border-black/5">
+                          <div className="space-y-1 flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{writing?.title ?? entry.writingId}</p>
+                            {writing?.authorName && (
+                              <p className="text-[10px] font-mono text-black/40">{writing.authorName}</p>
+                            )}
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest border border-black/10 text-black/40">{entry.stage}</span>
+                              <span className="px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest border border-black/10 text-black/40">{entry.priority}</span>
+                              {entry.themeFolder && (
+                                <span className="px-2 py-0.5 rounded-full font-mono text-[9px] uppercase tracking-widest border border-black/10 text-black/40">{entry.themeFolder}</span>
+                              )}
+                            </div>
+                            {entry.internalNote && (
+                              <p className="text-xs text-black/50 italic mt-1">{entry.internalNote}</p>
+                            )}
+                          </div>
+                          <div className="text-[10px] font-mono ml-4 shrink-0 text-black/30">
+                            {entry.createdAt ? format(new Date(entry.createdAt), "MMM d") : ""}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
@@ -290,19 +322,19 @@ export default function EditorStudio() {
                     {issues.map(issue => (
                       <div
                         key={issue.id}
-                        onClick={() => setSelectedId(selectedId === issue.id ? null : issue.id)}
-                        className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${selectedId === issue.id ? "bg-black text-white border-black" : "bg-[#f9f8f4] border-black/5 hover:border-black/20"}`}
+                        onClick={() => setSelectedIssueId(selectedIssueId === issue.id ? null : issue.id)}
+                        className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${selectedIssueId === issue.id ? "bg-black text-white border-black" : "bg-[#f9f8f4] border-black/5 hover:border-black/20"}`}
                       >
                         <div className="space-y-0.5">
-                          <p className={`text-sm font-medium ${selectedId === issue.id ? "text-white" : "text-black"}`}>{issue.title}</p>
+                          <p className={`text-sm font-medium ${selectedIssueId === issue.id ? "text-white" : "text-black"}`}>{issue.title}</p>
                           {issue.subtitle && (
-                            <p className={`text-xs ${selectedId === issue.id ? "text-white/60" : "text-black/50"}`}>{issue.subtitle}</p>
+                            <p className={`text-xs ${selectedIssueId === issue.id ? "text-white/60" : "text-black/50"}`}>{issue.subtitle}</p>
                           )}
                           {issue.publishDate && (
-                            <p className={`text-[10px] font-mono ${selectedId === issue.id ? "text-white/50" : "text-black/40"}`}>{format(new Date(issue.publishDate), "MMM d, yyyy")}</p>
+                            <p className={`text-[10px] font-mono ${selectedIssueId === issue.id ? "text-white/50" : "text-black/40"}`}>{format(new Date(issue.publishDate), "MMM d, yyyy")}</p>
                           )}
                         </div>
-                        <span className={`px-3 py-1 rounded-full font-mono text-[9px] uppercase tracking-widest border ${issue.status === "published" ? "bg-green-50 border-green-200 text-green-700" : issue.status === "archived" ? "bg-black/5 border-black/10 text-black/40" : selectedId === issue.id ? "border-white/20 text-white/70" : "border-black/10 text-black/50"}`}>
+                        <span className={`px-3 py-1 rounded-full font-mono text-[9px] uppercase tracking-widest border ${issue.status === "published" ? "bg-green-50 border-green-200 text-green-700" : issue.status === "archived" ? "bg-black/5 border-black/10 text-black/40" : selectedIssueId === issue.id ? "border-white/20 text-white/70" : "border-black/10 text-black/50"}`}>
                           {issue.status}
                         </span>
                       </div>
@@ -379,7 +411,7 @@ export default function EditorStudio() {
                   <p className="font-semibold text-sm leading-snug">{selectedIssue.title}</p>
                   {selectedIssue.subtitle && <p className="text-xs text-black/50 mt-0.5">{selectedIssue.subtitle}</p>}
                 </div>
-                <button onClick={() => setSelectedId(null)} className="text-black/30 hover:text-black/70 transition-colors mt-0.5 ml-2 shrink-0">
+                <button onClick={() => setSelectedIssueId(null)} className="text-black/30 hover:text-black/70 transition-colors mt-0.5 ml-2 shrink-0">
                   <X size={14} />
                 </button>
               </div>

@@ -51,6 +51,7 @@ export function useAuth() {
     retry: false,
     staleTime: 1000 * 60, // 60s
     refetchOnWindowFocus: true,
+    refetchInterval: 60_000, // re-validate in long-idle tabs every 60 s
     gcTime: 30000,
   });
 

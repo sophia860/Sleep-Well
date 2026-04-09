@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Flower2, Droplets, Zap, Leaf, Sprout, Trash2 } from "lucide-react";
+import { Sparkles, Flower2, Droplets, Zap, Leaf, Sprout, Trash2, Bookmark } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "@/hooks/use-toast";
 
@@ -414,6 +414,63 @@ export function TendButton({
     >
       <Sprout size={size === "sm" ? 12 : 14} />
       {isPending ? "..." : isTending ? "Tending ✓" : "Tend this Garden"}
+    </motion.button>
+  );
+}
+
+export function BookmarkButton({ writingId }: { writingId: string }) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const { data } = useQuery<{ kept: boolean }>({
+    queryKey: ["/api/bookshelf/check", writingId],
+    queryFn: async () => {
+      const res = await fetch(`/api/bookshelf/check/${writingId}`, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to check bookmark");
+      return res.json();
+    },
+    enabled: !!user,
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/bookshelf/${writingId}`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to toggle bookmark");
+      return res.json() as Promise<{ kept: boolean }>;
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bookshelf/check", writingId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bookshelf"] });
+      toast({ title: result.kept ? "Saved to your collection" : "Removed from saved" });
+    },
+    onError: () => {
+      toast({ title: "Could not save piece", variant: "destructive" });
+    },
+  });
+
+  if (!user) return null;
+
+  const isKept = data?.kept ?? false;
+  const isPending = toggleMutation.isPending;
+
+  return (
+    <motion.button
+      onClick={(e) => { e.stopPropagation(); if (!isPending) toggleMutation.mutate(); }}
+      disabled={isPending}
+      whileTap={{ scale: 1.3 }}
+      whileHover={{ scale: 1.1 }}
+      className={`p-1.5 rounded-lg transition-all ${
+        isKept
+          ? "text-amber-400/80 bg-amber-500/[0.08]"
+          : "text-white/30 hover:text-amber-400/70 hover:bg-amber-500/[0.06]"
+      }`}
+      title={isKept ? "Remove from saved" : "Save piece"}
+      data-testid={`button-bookmark-${writingId}`}
+    >
+      <Bookmark size={12} fill={isKept ? "currentColor" : "none"} />
     </motion.button>
   );
 }
