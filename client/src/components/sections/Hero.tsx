@@ -1,14 +1,37 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import StarTitle from "@/components/StarTitle";
-import { Link } from "wouter";
+import { useLocation, Link } from "wouter";
 import { gsap, prefersReducedMotion } from "@/lib/gsap-init";
 import { useAuth } from "@/hooks/use-auth";
+
+type GardenNavStatus = "idle" | "loading" | "auth-required" | "error";
 
 export default function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const { user, isLoading: authLoading } = useAuth();
+  const [, navigate] = useLocation();
+  const [navStatus, setNavStatus] = useState<GardenNavStatus>("idle");
+
+  const openGarden = useCallback(async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (navStatus === "loading") return;
+    setNavStatus("loading");
+    try {
+      const res = await fetch("/api/auth/user", { credentials: "include" });
+      if (res.status === 401) {
+        setNavStatus("auth-required");
+        navigate("/sign-in?next=/garden");
+        return;
+      }
+      if (!res.ok) throw new Error(`Session check failed: ${res.status} ${res.statusText}`);
+      setNavStatus("idle");
+      navigate("/garden");
+    } catch {
+      setNavStatus("error");
+    }
+  }, [navStatus, navigate]);
 
   // Framer-motion mouse tilt (original)
   const mouseX = useMotionValue(0);
@@ -53,8 +76,13 @@ export default function Hero() {
     );
   }, []);
 
-  // Resolve CTA destination: authenticated -> /garden, else -> /sign-in
-  const writingHref = !authLoading && user ? "/garden" : "/sign-in";
+  function gardenWritingLabel(status: GardenNavStatus, isAuthLoading: boolean, isUser: boolean): string {
+    if (status === "loading") return "Opening\u2026";
+    if (!isAuthLoading && isUser) return "Open the Garden editor";
+    return "Start Writing \u2014 it\u2019s free";
+  }
+
+  const writingLabel = gardenWritingLabel(navStatus, authLoading, !!user);
 
   return (
     <div ref={heroRef} className="relative">
@@ -121,24 +149,38 @@ export default function Hero() {
                 </Link>
 
                 {/* Secondary: start writing */}
-                <Link
-                  href={writingHref}
-                  className="group flex items-center gap-3"
-                  data-testid="cta-start-writing"
-                >
-                  <span
-                    className="
-                    font-sans text-[length:var(--text-label)] uppercase tracking-[0.08em]
-                    px-5 py-2.5 rounded-full
-                    border border-amber-500/30 text-amber-200/80
-                    bg-amber-900/10 hover:bg-amber-900/20
-                    hover:border-amber-500/60 hover:text-amber-100
-                    transition-all duration-300
-                    "
+                <div className="flex flex-col items-start gap-1.5">
+                  <button
+                    onClick={openGarden}
+                    disabled={navStatus === "loading" || authLoading}
+                    className="group flex items-center gap-3"
+                    data-testid="cta-start-writing"
+                    aria-busy={navStatus === "loading"}
                   >
-                    {!authLoading && user ? "Open Your Garden" : "Start Writing — it's free"}
-                  </span>
-                </Link>
+                    <span
+                      className="
+                      font-sans text-[length:var(--text-label)] uppercase tracking-[0.08em]
+                      px-5 py-2.5 rounded-full
+                      border border-amber-500/30 text-amber-200/80
+                      bg-amber-900/10 hover:bg-amber-900/20
+                      hover:border-amber-500/60 hover:text-amber-100
+                      transition-all duration-300
+                      disabled:cursor-wait disabled:opacity-60
+                      "
+                    >
+                      {writingLabel}
+                    </span>
+                  </button>
+                  {navStatus === "error" && (
+                    <p
+                      data-garden-status
+                      role="alert"
+                      className="font-sans text-xs text-red-400/70"
+                    >
+                      We could not open your Garden. Please try again.
+                    </p>
+                  )}
+                </div>
 
                 {/* Tertiary: about */}
                 <Link
