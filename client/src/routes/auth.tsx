@@ -1,79 +1,112 @@
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { supabase } from '@/lib/supabase'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
+
+const studioAuthSchema = z.object({
+  username: z.string().min(2, 'Username must be at least 2 characters').max(32),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+})
+
+type StudioAuthFields = z.infer<typeof studioAuthSchema>
+
+// Supabase requires an email format; we map username → synthetic local email.
+// Password reset and email verification are handled separately via the studio admin flow.
+function toLocalEmail(username: string): string {
+  return `${username}@thepagegallery.local`
+}
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [serverError, setServerError] = useState<string | null>(null)
+  const prefersReducedMotion = useReducedMotion()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<StudioAuthFields>({
+    resolver: zodResolver(studioAuthSchema),
+  })
 
-    const email = `${username}@thepagegallery.local`
+  const onSubmit = async ({ username, password }: StudioAuthFields) => {
+    setServerError(null)
+    const email = toLocalEmail(username)
 
     try {
       if (isLogin) {
-        const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
-        if (authError) throw authError
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
       } else {
-        const { error: authError } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           options: { data: { username } },
         })
-        if (authError) throw authError
+        if (error) throw error
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
-    } finally {
-      setLoading(false)
+      setServerError(
+        err instanceof Error ? err.message : 'Unable to complete this action — try again.',
+      )
     }
   }
+
+  const motionProps = prefersReducedMotion
+    ? {}
+    : { initial: { opacity: 0 }, animate: { opacity: 1 } }
+
+  const buttonHoverProps = prefersReducedMotion ? {} : { whileHover: { scale: 1.02 } }
 
   return (
     <div className="min-h-screen bg-[#F8F4EC] flex items-center justify-center p-6">
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        {...motionProps}
         className="max-w-md w-full bg-white border border-[#E5DFD2] rounded-3xl p-10 shadow-2xl"
       >
         <h1 className="text-5xl font-display tracking-tighter mb-1">the studio</h1>
         <p className="text-[#6B2A2A] font-mono text-sm">The Page Gallery • The Garden</p>
 
-        <form onSubmit={handleSubmit} className="mt-10 space-y-6">
-          <input
-            type="text"
-            placeholder="username"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            required
-            className="w-full border border-[#E5DFD2] focus:border-[#6B2A2A] px-6 py-5 rounded-2xl outline-none text-lg"
-          />
-          <input
-            type="password"
-            placeholder="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            className="w-full border border-[#E5DFD2] focus:border-[#6B2A2A] px-6 py-5 rounded-2xl outline-none text-lg"
-          />
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-10 space-y-6">
+          <div>
+            <input
+              {...register('username')}
+              type="text"
+              placeholder="username"
+              className="w-full border border-[#E5DFD2] focus:border-[#6B2A2A] px-6 py-5 rounded-2xl outline-none text-lg"
+            />
+            {errors.username && (
+              <p className="mt-1 text-xs text-[#6B2A2A] font-mono">{errors.username.message}</p>
+            )}
+          </div>
 
-          {error && (
-            <p className="text-sm text-[#6B2A2A] font-mono">{error}</p>
+          <div>
+            <input
+              {...register('password')}
+              type="password"
+              placeholder="password"
+              className="w-full border border-[#E5DFD2] focus:border-[#6B2A2A] px-6 py-5 rounded-2xl outline-none text-lg"
+            />
+            {errors.password && (
+              <p className="mt-1 text-xs text-[#6B2A2A] font-mono">{errors.password.message}</p>
+            )}
+          </div>
+
+          {serverError && (
+            <p className="text-sm text-[#6B2A2A] font-mono">{serverError}</p>
           )}
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            {...buttonHoverProps}
             type="submit"
-            disabled={loading}
+            disabled={isSubmitting}
             className="w-full bg-[#6B2A2A] text-white py-6 rounded-3xl text-sm tracking-[2px] disabled:opacity-60"
           >
-            {loading ? '...' : isLogin ? 'ENTER THE STUDIO' : 'CREATE ACCOUNT'}
+            {isSubmitting
+              ? isLogin ? 'entering the studio…' : 'preparing your space…'
+              : isLogin ? 'ENTER THE STUDIO' : 'CREATE ACCOUNT'}
           </motion.button>
         </form>
 
