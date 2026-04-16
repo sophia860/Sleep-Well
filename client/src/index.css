@@ -32,49 +32,54 @@
   --space-6: 48px;
   --space-10: 80px;
 
-  /* NY Writers Studio — warm, ink-stained, quietly expensive */
-  --color-background: #F8F4EC;
+  /* The Page Gallery Journal — gallery-warm, ink-stained, baroque gold */
+  --color-background: #F5EFE4;
   --color-foreground: #1C1208;
 
-  --color-card: #F0EBE0;
+  --color-card: #EEE7D8;
   --color-card-foreground: #1C1208;
 
-  --color-popover: #EDE7D9;
+  --color-popover: #E8E0CF;
   --color-popover-foreground: #1C1208;
 
   --color-primary: #6B2A2A;
-  --color-primary-foreground: #F8F4EC;
+  --color-primary-foreground: #F5EFE4;
 
-  --color-secondary: #F0EBE0;
+  --color-secondary: #EEE7D8;
   --color-secondary-foreground: #1C1208;
 
-  --color-muted: #E8E2D4;
-  --color-muted-foreground: #6B5E4A;
+  --color-muted: #E2DAC8;
+  --color-muted-foreground: #4E3C28;
 
-  /* Accent split: burgundy CTA + gold ornament */
-  --color-accent-cta: #FF6B6B;
-  --color-accent-ornament: #c4a24d;
+  /* Accent split: burgundy CTA + gallery gold ornament */
+  --color-accent-cta: #C2542A;
+  --color-accent-ornament: #B8883B;
   --color-accent: #6B2A2A;
-  --color-accent-foreground: #F8F4EC;
+  --color-accent-foreground: #F5EFE4;
+
+  /* Gallery gold — drawn from the baroque frame */
+  --color-gallery-gold: #B8883B;
+  --color-gallery-gold-light: #D4A84E;
+  --color-gallery-gold-dark: #8C621A;
 
   /* Studio palette */
   --color-studio-burgundy: #6B2A2A;
-  --color-studio-olive: #8A8F6F;
-  --color-studio-coral: #FF6B6B;
+  --color-studio-olive: #7A7E5F;
+  --color-studio-coral: #C2542A;
   --color-studio-ink: #1C1208;
-  --color-studio-paper: #F8F4EC;
-  --color-studio-parchment: #F0EBE0;
+  --color-studio-paper: #F5EFE4;
+  --color-studio-parchment: #EEE7D8;
 
   /* Legacy tokens kept for backward compat */
-  --color-garden-bloom: #8A8F6F;
+  --color-garden-bloom: #7A7E5F;
   --color-agent-lavender: #8b7ec8;
 
   --color-destructive: hsl(0 60% 50%);
   --color-destructive-foreground: hsl(0 0% 98%);
 
   --color-border: rgba(107, 42, 42, 0.15);
-  --color-input: #E8E2D4;
-  --color-ring: #6B2A2A;
+  --color-input: #E2DAC8;
+  --color-ring: #B8883B;
 
   --radius: 0.5rem;
 }
@@ -90,21 +95,24 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground overflow-x-hidden;
-    background-color: #F8F4EC;
+    background-color: #F5EFE4;
+    font-size: 1.0625rem;
+    line-height: 1.75;
     /* subtle paper texture via repeating gradient */
     background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
     selection-background-color: #6B2A2A;
-    selection-color: #F8F4EC;
+    selection-color: #F5EFE4;
   }
 
   ::selection {
-    background-color: rgba(107, 42, 42, 0.15);
+    background-color: rgba(184, 136, 59, 0.25);
     color: #1C1208;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display tracking-normal font-light;
+    line-height: 1.2;
   }
   p {
     @apply leading-relaxed;
@@ -122,19 +130,19 @@
 
   /* Studio paper + ink aesthetic */
   .studio-paper {
-    background-color: #F8F4EC;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-color: #F5EFE4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
   }
 
   .studio-card {
-    background-color: #F0EBE0;
-    border: 1px solid rgba(107, 42, 42, 0.12);
+    background-color: #EEE7D8;
+    border: 1px solid rgba(184, 136, 59, 0.18);
     box-shadow: 0 1px 3px rgba(28, 18, 8, 0.06), 0 4px 16px rgba(28, 18, 8, 0.04);
   }
 
   .studio-index-card {
-    background-color: #FAF6EE;
-    border: 1px solid rgba(107, 42, 42, 0.12);
+    background-color: #F5EFE4;
+    border: 1px solid rgba(184, 136, 59, 0.2);
     box-shadow: 2px 3px 8px rgba(28, 18, 8, 0.08);
     position: relative;
   }
@@ -146,15 +154,15 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #6B2A2A 0%, #c4a24d 100%);
-    opacity: 0.6;
+    background: linear-gradient(90deg, #6B2A2A 0%, #B8883B 100%);
+    opacity: 0.7;
   }
 
   .handwritten-note {
     font-family: 'Caveat', cursive;
-    background-color: #FFF9EC;
-    border: 1px solid rgba(196, 162, 77, 0.3);
-    box-shadow: 2px 4px 12px rgba(28, 18, 8, 0.10), 0 0 0 1px rgba(196, 162, 77, 0.1);
+    background-color: #FFF5E6;
+    border: 1px solid rgba(184, 136, 59, 0.35);
+    box-shadow: 2px 4px 12px rgba(28, 18, 8, 0.10), 0 0 0 1px rgba(184, 136, 59, 0.12);
     transform: rotate(-1.5deg);
     position: relative;
   }
@@ -167,19 +175,19 @@
     transform: translateX(-50%);
     width: 40px;
     height: 12px;
-    background: rgba(196, 162, 77, 0.4);
+    background: rgba(184, 136, 59, 0.5);
     border-radius: 2px;
     box-shadow: 0 2px 4px rgba(28, 18, 8, 0.15);
   }
 
   .ink-smudge-border {
     border-bottom: 2px solid transparent;
-    border-image: linear-gradient(90deg, transparent, rgba(107,42,42,0.3), rgba(196,162,77,0.4), rgba(107,42,42,0.3), transparent) 1;
+    border-image: linear-gradient(90deg, transparent, rgba(107,42,42,0.3), rgba(184,136,59,0.4), rgba(107,42,42,0.3), transparent) 1;
   }
 
   .studio-section-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, rgba(107,42,42,0.2) 30%, rgba(196,162,77,0.3) 50%, rgba(107,42,42,0.2) 70%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, rgba(107,42,42,0.15) 30%, rgba(184,136,59,0.35) 50%, rgba(107,42,42,0.15) 70%, transparent 100%);
   }
 
   .font-handwritten {
@@ -188,14 +196,14 @@
 
   .progress-bar-studio {
     height: 6px;
-    background: #E8E2D4;
+    background: #E2DAC8;
     border-radius: 3px;
     overflow: hidden;
   }
 
   .progress-bar-studio-fill {
     height: 100%;
-    background: linear-gradient(90deg, #6B2A2A 0%, #c4a24d 100%);
+    background: linear-gradient(90deg, #6B2A2A 0%, #B8883B 100%);
     border-radius: 3px;
     transition: width 1s ease-out;
   }
@@ -1819,83 +1827,38 @@ h1, h1, h2, h3, h4, h5, h6,
 
 
 
-/* Global star background: make all page wrappers transparent so 3D stars show through */
-.min-h-screen[style*="background"],
-div.min-h-screen.bg-transparent,
-div.min-h-screen.relative {
-    background-color: transparent !important;
-}
-
-/* Override all Tailwind arbitrary bg colors on page wrappers */
-[class*="min-h-screen"][class*="bg-["] {
-    background-color: transparent !important;
-}
-
-/* Make body and garden backgrounds transparent for global stars */
-body {
-    background-color: transparent !important;
-}
-.garden-bg {
-    background: transparent !important;
-}
+/* Global star background: make garden page wrappers transparent so 3D stars show through */
+.garden-bg,
 .night-garden-atmosphere {
     background: transparent !important;
 }
 
-/* --- Hero content: force white text in dark mode --- */
-#hero-content h1,
-#hero-content p,
-#hero-content span {
+/* ── Garden / dark-star pages: white text ───────────────────────────────── */
+/* Scope all white-text overrides to .garden-bg or .night-garden-atmosphere
+   so they never bleed onto the light parchment homepage. */
+.garden-bg #hero-content h1,
+.garden-bg #hero-content p,
+.garden-bg #hero-content span,
+.night-garden-atmosphere h1,
+.night-garden-atmosphere p,
+.night-garden-atmosphere span {
     color: #ffffff !important;
-}
-.garden-light #hero-content h1,
-.garden-light #hero-content p,
-.garden-light #hero-content span {
-        color: #ffffff !important;
 }
 
-/* === Homepage legibility fix: force white text on dark bg sections === */
-.min-h-screen[class*="text-foreground"] h1,
-.min-h-screen[class*="text-foreground"] h2,
-.min-h-screen[class*="text-foreground"] h3,
-.min-h-screen[class*="text-foreground"] h4,
-.min-h-screen[class*="text-foreground"] h5,
-.min-h-screen[class*="text-foreground"] h6 {
+/* Garden pages — dark panel legibility */
+.garden-bg .min-h-screen h1,
+.garden-bg .min-h-screen h2,
+.garden-bg .min-h-screen h3,
+.garden-bg .min-h-screen h4,
+.garden-bg .min-h-screen h5,
+.garden-bg .min-h-screen h6 {
     color: #ffffff !important;
 }
-.min-h-screen[class*="text-foreground"] p,
-.min-h-screen[class*="text-foreground"] span,
-.min-h-screen[class*="text-foreground"] li,
-.min-h-screen[class*="text-foreground"] small {
-    color: rgba(255, 255, 255, 0.75) !important;
-}
-.min-h-screen[class*="text-foreground"] a:not([class*="text-"]) {
-    color: rgba(255, 255, 255, 0.9) !important
-}
-
-
-/* === Fix text-primary on dark bg homepage sections === */
-.text-primary h1,
-.text-primary h2,
-.text-primary h3,
-.text-primary h4,
-.text-primary h5,
-.text-primary h6 {
-    color: #ffffff !important;
-}
-.text-primary p,
-.text-primary span,
-.text-primary li {
-    color: rgba(255, 255, 255, 0.75) !important;
-}
-/* === bg-transparent headings === */
-.bg-transparent h1,
-.bg-transparent h2,
-.bg-transparent h3,
-.bg-transparent h4,
-.bg-transparent h5,
-.bg-transparent h6 {
-    color: #ffffff !important;
+.garden-bg .min-h-screen p,
+.garden-bg .min-h-screen span,
+.garden-bg .min-h-screen li,
+.garden-bg .min-h-screen small {
+    color: rgba(255, 255, 255, 0.8) !important;
 }
 
 
