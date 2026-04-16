@@ -224,7 +224,7 @@ export default function Hero() {
                 <p className="font-handwritten text-[clamp(0.8rem,1.4vw,0.95rem)] text-[#6B2A2A] leading-relaxed">
                   This journal is one of them. — S.
                 </p>
-                <div className="mt-4 border-t border-[#c4a24d]/20 pt-3">
+                <div className="mt-4 border-t border-[#B8883B]/20 pt-3">
                   <span className="font-mono text-[9px] text-[#1C1208]/35 uppercase tracking-widest">
                     Founder's Desk — Pinned
                   </span>
