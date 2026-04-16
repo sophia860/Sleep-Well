@@ -94,14 +94,14 @@ export default function Hero() {
         id="hero-content"
         className="flex-1 pt-32 pb-24 px-6 md:px-12 lg:px-20 max-w-7xl mx-auto w-full"
       >
-        <div className="grid lg:grid-cols-12 gap-16 items-start">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Main headline column */}
-          <div className="lg:col-span-7 space-y-10">
+          <div className="lg:col-span-7 space-y-8">
             <motion.p
               initial={shouldReduceMotion ? {} : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.05 }}
-              className="font-mono text-[length:var(--text-label)] tracking-[0.2em] uppercase text-[#6B2A2A]/70"
+              className="font-mono text-[length:var(--text-label)] tracking-[0.2em] uppercase text-[#6B2A2A]/80"
             >
               The Page Gallery Journal — Est. 2024
             </motion.p>
@@ -125,11 +125,11 @@ export default function Hero() {
               transition={{ duration: 0.9, delay: 0.5 }}
               className="space-y-4 max-w-xl"
             >
-              <p className="font-sans text-base leading-relaxed text-[#1C1208]/70">
+              <p className="font-sans text-[1.0625rem] leading-[1.75] text-[#1C1208]/80">
                 The Page Gallery publishes poetry, fiction, and essays that resist easy resolution.
                 We believe in writing that earns its silences — work that asks something of the reader.
               </p>
-              <p className="font-sans text-sm leading-relaxed text-[#1C1208]/50">
+              <p className="font-sans text-[0.9375rem] leading-[1.7] text-[#1C1208]/60">
                 No slush pile. No query letters. No waiting rooms.
                 Every writer gets a Desk — a private space for drafts, fragments, and work that isn't ready yet.
               </p>
@@ -161,7 +161,7 @@ export default function Hero() {
 
               <Link
                 href={writingHref}
-                className="font-mono text-[length:var(--text-label)] uppercase tracking-[0.12em] text-[#1C1208]/40 hover:text-[#6B2A2A] transition-colors border-b border-transparent hover:border-[#6B2A2A]/40 pb-0.5"
+                className="font-mono text-[length:var(--text-label)] uppercase tracking-[0.12em] text-[#1C1208]/50 hover:text-[#6B2A2A] transition-colors border-b border-transparent hover:border-[#6B2A2A]/40 pb-0.5"
                 data-testid="cta-start-writing"
               >
                 {!authLoading && user ? "Open Your Desk" : "Start Writing — it's free"}
@@ -179,29 +179,67 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          {/* Handwritten note — 1992 story */}
+          {/* Gallery Frame — Founder's note as a gallery exhibit */}
           <motion.aside
-            initial={shouldReduceMotion ? {} : { opacity: 0, rotate: -3, y: 20 }}
-            animate={{ opacity: 1, rotate: -1.5, y: 0 }}
-            transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.1, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-5 handwritten-note p-7 rounded-sm mt-8 lg:mt-24"
+            initial={shouldReduceMotion ? {} : { opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.2, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-5 relative flex items-start justify-center lg:justify-end"
             aria-label="Founder's note"
           >
-            <p className="font-handwritten text-xl text-[#1C1208]/80 leading-relaxed mb-4">
-              1992. I was eleven, going door to door selling chocolate bars for the school.
-            </p>
-            <p className="font-handwritten text-lg text-[#1C1208]/70 leading-relaxed mb-4">
-              My mum said I didn't need to. I did it anyway —
-              something in me already knew: if you don't ask, the answer is always no.
-            </p>
-            <p className="font-handwritten text-lg text-[#1C1208]/70 leading-relaxed mb-4">
-              That kid never left. She just found better things to sell.
-            </p>
-            <p className="font-handwritten text-lg text-[#6B2A2A] leading-relaxed">
-              This journal is one of them. — S.
-            </p>
-            <div className="mt-5 flex items-center gap-2">
-              <span className="font-mono text-[10px] text-[#1C1208]/30 uppercase tracking-widest">Pinned — Founder's desk</span>
+            <div className="relative w-full max-w-[400px] lg:max-w-none">
+              {/* Warm parchment fill visible through the frame opening */}
+              <div
+                className="absolute z-0 rounded-sm"
+                style={{
+                  top: "15.5%",
+                  left: "21%",
+                  right: "21%",
+                  bottom: "15.5%",
+                  background: "linear-gradient(160deg, #FFF8F0 0%, #F5EBD8 100%)",
+                  boxShadow: "inset 0 2px 16px rgba(28, 18, 8, 0.07)",
+                }}
+              />
+
+              {/* Founder's note positioned inside the frame opening */}
+              <div
+                className="absolute z-[5] flex flex-col justify-center"
+                style={{
+                  top: "19%",
+                  left: "25%",
+                  right: "25%",
+                  bottom: "19%",
+                }}
+              >
+                <p className="font-handwritten text-[clamp(0.85rem,1.5vw,1.05rem)] text-[#1C1208]/85 leading-relaxed mb-3">
+                  1992. I was eleven, going door to door selling chocolate bars for the school.
+                </p>
+                <p className="font-handwritten text-[clamp(0.8rem,1.4vw,0.95rem)] text-[#1C1208]/75 leading-relaxed mb-3">
+                  My mum said I didn't need to. I did it anyway —
+                  something in me already knew: if you don't ask, the answer is always no.
+                </p>
+                <p className="font-handwritten text-[clamp(0.8rem,1.4vw,0.95rem)] text-[#1C1208]/75 leading-relaxed mb-3">
+                  That kid never left. She just found better things to sell.
+                </p>
+                <p className="font-handwritten text-[clamp(0.8rem,1.4vw,0.95rem)] text-[#6B2A2A] leading-relaxed">
+                  This journal is one of them. — S.
+                </p>
+                <div className="mt-4 border-t border-[#B8883B]/20 pt-3">
+                  <span className="font-mono text-[9px] text-[#1C1208]/35 uppercase tracking-widest">
+                    Founder's Desk — Pinned
+                  </span>
+                </div>
+              </div>
+
+              {/* Ornate gold frame overlay — sits on top, transparent interior shows parchment */}
+              <img
+                src="/gold-frame.png"
+                alt=""
+                aria-hidden="true"
+                className="relative z-10 w-full pointer-events-none select-none drop-shadow-xl"
+                draggable={false}
+                loading="eager"
+              />
             </div>
           </motion.aside>
         </div>
